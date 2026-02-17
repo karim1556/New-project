@@ -9,49 +9,62 @@ export async function readDb(): Promise<Database> {
     return getDemoDb();
   }
 
-  const [
-    users,
-    teams,
-    projects,
-    dailyLogs,
-    hackathons,
-    attendance,
-    announcements,
-    files,
-    points
-  ] = await Promise.all([
-    supabaseRequest<Database["users"]>("users", { method: "GET", query: "select=*" }),
-    supabaseRequest<Database["teams"]>("teams", { method: "GET", query: "select=*" }),
-    supabaseRequest<Database["projects"]>("projects", { method: "GET", query: "select=*" }),
-    supabaseRequest<Database["dailyLogs"]>("daily_logs", { method: "GET", query: "select=*" }),
-    supabaseRequest<Database["hackathons"]>("hackathons", { method: "GET", query: "select=*" }),
-    supabaseRequest<Database["attendance"]>("attendance", { method: "GET", query: "select=*" }),
-    supabaseRequest<Database["announcements"]>("announcements", {
-      method: "GET",
-      query: "select=*"
-    }),
-    supabaseRequest<Database["files"]>("files", { method: "GET", query: "select=*" }),
-    supabaseRequest<Database["points"]>("points", { method: "GET", query: "select=*" })
-  ]);
+  try {
+    const [
+      users,
+      teams,
+      projects,
+      dailyLogs,
+      hackathons,
+      attendance,
+      announcements,
+      files,
+      points,
+      checkpoints,
+      checkpointSubmissions
+    ] = await Promise.all([
+      supabaseRequest<Database["users"]>("users", { method: "GET", query: "select=*" }),
+      supabaseRequest<Database["teams"]>("teams", { method: "GET", query: "select=*" }),
+      supabaseRequest<Database["projects"]>("projects", { method: "GET", query: "select=*" }),
+      supabaseRequest<Database["dailyLogs"]>("daily_logs", { method: "GET", query: "select=*" }),
+      supabaseRequest<Database["hackathons"]>("hackathons", { method: "GET", query: "select=*" }),
+      supabaseRequest<Database["attendance"]>("attendance", { method: "GET", query: "select=*" }),
+      supabaseRequest<Database["announcements"]>("announcements", {
+        method: "GET",
+        query: "select=*"
+      }),
+      supabaseRequest<Database["files"]>("files", { method: "GET", query: "select=*" }),
+      supabaseRequest<Database["points"]>("points", { method: "GET", query: "select=*" }),
+      supabaseRequest<Database["checkpoints"]>("checkpoints", { method: "GET", query: "select=*" }),
+      supabaseRequest<Database["checkpointSubmissions"]>("checkpoint_submissions", {
+        method: "GET",
+        query: "select=*"
+      })
+    ]);
 
-  const db = {
-    users,
-    teams,
-    projects,
-    dailyLogs,
-    hackathons,
-    attendance,
-    announcements,
-    files,
-    points
-  };
+    const db = {
+      users,
+      teams,
+      projects,
+      dailyLogs,
+      hackathons,
+      attendance,
+      announcements,
+      files,
+      points,
+      checkpoints,
+      checkpointSubmissions
+    };
 
-  // If Supabase is connected but unseeded, keep demo login and UI usable.
-  if (db.users.length === 0) {
+    // If Supabase is connected but unseeded, keep demo login and UI usable.
+    if (db.users.length === 0) {
+      return getDemoDb();
+    }
+
+    return db;
+  } catch {
     return getDemoDb();
   }
-
-  return db;
 }
 
 export async function writeDb(db: Database): Promise<void> {
@@ -88,6 +101,8 @@ export async function writeDb(db: Database): Promise<void> {
   await replaceTable("announcements", db.announcements);
   await replaceTable("files", db.files);
   await replaceTable("points", db.points);
+  await replaceTable("checkpoints", db.checkpoints);
+  await replaceTable("checkpoint_submissions", db.checkpointSubmissions);
 }
 
 export function makeId(prefix: string): string {

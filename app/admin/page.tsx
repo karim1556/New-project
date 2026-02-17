@@ -55,6 +55,63 @@ export default async function AdminDashboardPage() {
           </table>
         </div>
       </Section>
+
+      <Section title="External Hackathons" subtitle="Cross-team participation and outcomes.">
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Team</th>
+                <th>Hackathon</th>
+                <th>Platform</th>
+                <th>Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {overview.recentHackathons.map((item) => (
+                <tr key={item.id}>
+                  <td>{overview.db.teams.find((t) => t.id === item.teamId)?.name ?? item.teamId}</td>
+                  <td>{item.hackathonName}</td>
+                  <td>{item.platform}</td>
+                  <td>{item.date}</td>
+                  <td>{item.status}</td>
+                </tr>
+              ))}
+              {overview.recentHackathons.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="muted">
+                    No hackathon entries yet.
+                  </td>
+                </tr>
+              ) : null}
+            </tbody>
+          </table>
+        </div>
+      </Section>
+
+      <Section title="Team Activity Snapshot" subtitle="Daily logs and hackathon entries by team.">
+        <div className="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Team</th>
+                <th>Total Daily Logs</th>
+                <th>Total Hackathons</th>
+              </tr>
+            </thead>
+            <tbody>
+              {overview.teamLogSummary.map((row) => (
+                <tr key={row.teamId}>
+                  <td>{row.teamName}</td>
+                  <td>{row.totalLogs}</td>
+                  <td>{row.totalHackathons}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </Section>
     </>
   );
 }

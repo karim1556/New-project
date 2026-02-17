@@ -36,6 +36,12 @@ export default function LoginPage({
             <p className="login-error">Invalid email or password.</p>
           ) : null}
 
+          {searchParams.error === "leader_only" ? (
+            <p className="login-error">
+              Only team leader accounts can access the member dashboard.
+            </p>
+          ) : null}
+
           <form action={loginAction} className="login-form">
             <label>
               Email

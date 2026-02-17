@@ -21,13 +21,23 @@ export default async function AttendancePage() {
           <div className="attendance-sheet">
             {db.teams.map((team) => (
               <div key={team.id} className="attendance-team">
-                <strong>{team.name}</strong>
+                <div className="team-row">
+                  <strong>{team.name}</strong>
+                  <label>
+                    Quick mode
+                    <select name={`mode_${team.id}`} defaultValue="custom">
+                      <option value="custom">Custom member selection</option>
+                      <option value="present">Mark all present</option>
+                      <option value="absent">Mark all absent</option>
+                    </select>
+                  </label>
+                </div>
                 <div className="check-grid">
                   {members
                     .filter((m) => m.teamId === team.id)
                     .map((member) => (
                       <label key={member.id} className="check-item">
-                        <input type="checkbox" name={`member_${member.id}`} />
+                        <input type="checkbox" name={`member_${member.id}`} defaultChecked />
                         {member.name}
                       </label>
                     ))}

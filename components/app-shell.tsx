@@ -19,6 +19,11 @@ export function AppShell({
 }) {
   const pathname = usePathname();
   const pageLabel = items.find((item) => item.href === pathname)?.label ?? "Overview";
+  const formattedDate = new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date());
 
   return (
     <div className="container-grid">
@@ -29,7 +34,7 @@ export function AppShell({
             <p className="shell-eyebrow">{title}</p>
             <h1 className="shell-title">{pageLabel}</h1>
           </div>
-          <p className="shell-time">{new Date().toLocaleDateString()}</p>
+          <p className="shell-time">{formattedDate}</p>
         </header>
         <main>{children}</main>
       </div>

@@ -7,6 +7,7 @@ export type User = {
   password: string;
   role: Role;
   teamId?: string;
+  isTeamLeader?: boolean;
 };
 
 export type Team = {
@@ -88,6 +89,35 @@ export type LeaderboardPoint = {
   reason: string;
   points: number;
   createdAt: string;
+  createdBy?: string;
+};
+
+export type CheckpointStatus = "Pending" | "Approved" | "Rejected";
+
+export type TeamCheckpoint = {
+  id: string;
+  teamId: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  points: number;
+  createdAt: string;
+  createdBy: string;
+};
+
+export type CheckpointSubmission = {
+  id: string;
+  checkpointId: string;
+  teamId: string;
+  submittedBy: string;
+  evidence: string;
+  notes: string;
+  submittedAt: string;
+  status: CheckpointStatus;
+  reviewedBy?: string;
+  reviewedAt?: string;
+  reviewNotes?: string;
+  awardedPointId?: string;
 };
 
 export type Database = {
@@ -100,4 +130,6 @@ export type Database = {
   announcements: Announcement[];
   files: FileAttachment[];
   points: LeaderboardPoint[];
+  checkpoints: TeamCheckpoint[];
+  checkpointSubmissions: CheckpointSubmission[];
 };

@@ -25,6 +25,10 @@ export async function loginAction(formData: FormData): Promise<void> {
     redirect("/login?error=invalid_credentials");
   }
 
+  if (user.role === "member" && !user.isTeamLeader) {
+    redirect("/login?error=leader_only");
+  }
+
   setSession(user.id, user.role);
   redirect(user.role === "admin" ? "/admin" : "/member");
 }
@@ -48,6 +52,65 @@ export async function createTeamAction(formData: FormData): Promise<void> {
   revalidatePath("/admin");
 }
 
+export async function createTeamLeaderAction(formData: FormData): Promise<void> {
+  const current = await getCurrentUser();
+  if (!current || current.role !== "admin") return;
+
+  const teamId = String(formData.get("teamId") ?? "").trim();
+  const leaderName = String(formData.get("leaderName") ?? "").trim();
+  const leaderEmail = String(formData.get("leaderEmail") ?? "").trim().toLowerCase();
+  const leaderPassword = String(formData.get("leaderPassword") ?? "").trim();
+
+  if (!teamId || !leaderName || !leaderEmail || !leaderPassword) return;
+
+  const db = await readDb();
+  const team = db.teams.find((t) => t.id === teamId);
+  if (!team) return;
+
+  const existingLeader = db.users.find(
+    (u) => u.role === "member" && u.teamId === teamId && u.isTeamLeader
+  );
+  const userByEmail = db.users.find((u) => u.email.toLowerCase() === leaderEmail);
+
+  if (userByEmail && userByEmail.teamId !== teamId) return;
+
+  if (existingLeader) {
+    existingLeader.name = leaderName;
+    existingLeader.email = leaderEmail;
+    existingLeader.password = leaderPassword;
+    existingLeader.isTeamLeader = true;
+  } else if (userByEmail) {
+    userByEmail.name = leaderName;
+    userByEmail.password = leaderPassword;
+    userByEmail.role = "member";
+    userByEmail.teamId = teamId;
+    userByEmail.isTeamLeader = true;
+    team.memberIds = Array.from(new Set([...team.memberIds, userByEmail.id]));
+  } else {
+    const leaderId = makeId("u");
+    db.users.push({
+      id: leaderId,
+      name: leaderName,
+      email: leaderEmail,
+      password: leaderPassword,
+      role: "member",
+      teamId,
+      isTeamLeader: true
+    });
+    team.memberIds = Array.from(new Set([...team.memberIds, leaderId]));
+  }
+
+  db.users.forEach((u) => {
+    if (u.role === "member" && u.teamId === teamId && u.email.toLowerCase() !== leaderEmail) {
+      u.isTeamLeader = false;
+    }
+  });
+
+  await writeDb(db);
+  revalidatePath("/admin/teams");
+  revalidatePath("/admin");
+}
+
 export async function markAttendanceAction(formData: FormData): Promise<void> {
   const current = await getCurrentUser();
   if (!current || current.role !== "admin") return;
@@ -63,7 +126,13 @@ export async function markAttendanceAction(formData: FormData): Promise<void> {
   db.users
     .filter((u) => u.role === "member" && u.teamId && teamIds.has(u.teamId))
     .forEach((member) => {
-      const present = formData.get(`member_${member.id}`) === "on";
+      const mode = String(formData.get(`mode_${member.teamId}`) ?? "custom");
+      const present =
+        mode === "present"
+          ? true
+          : mode === "absent"
+            ? false
+            : formData.get(`member_${member.id}`) === "on";
       db.attendance.push({
         id: makeId("at"),
         date,
@@ -84,12 +153,20 @@ export async function createAnnouncementAction(formData: FormData): Promise<void
 
   const title = String(formData.get("title") ?? "").trim();
   const message = String(formData.get("message") ?? "").trim();
+  const importance = String(formData.get("importance") ?? "normal").trim().toLowerCase();
   if (!title || !message) return;
+
+  const titlePrefix =
+    importance === "critical"
+      ? "[CRITICAL] "
+      : importance === "reminder"
+        ? "[REMINDER] "
+        : "";
 
   const db = await readDb();
   db.announcements.unshift({
     id: makeId("an"),
-    title,
+    title: `${titlePrefix}${title}`,
     message,
     createdAt: new Date().toISOString(),
     createdBy: current.id
@@ -120,6 +197,12 @@ export async function createProjectAction(formData: FormData): Promise<void> {
     : "Planning";
 
   const db = await readDb();
+  const exists = db.projects.some(
+    (project) =>
+      project.teamId === current.teamId && project.title.toLowerCase() === title.toLowerCase()
+  );
+  if (exists) return;
+
   db.projects.push({
     id: makeId("p"),
     teamId: current.teamId,
@@ -132,17 +215,49 @@ export async function createProjectAction(formData: FormData): Promise<void> {
     status
   });
 
-  db.points.push({
-    id: makeId("pt"),
+  await writeDb(db);
+  revalidatePath("/member/projects");
+  revalidatePath("/member");
+  revalidatePath("/admin");
+}
+
+export async function updateProjectProgressAction(formData: FormData): Promise<void> {
+  const current = await getCurrentUser();
+  if (!current || current.role !== "member" || !current.teamId) return;
+
+  const projectId = String(formData.get("projectId") ?? "").trim();
+  const progress = asNumber(formData.get("progress"), 0);
+  const statusRaw = String(formData.get("status") ?? "Development");
+  const summary = String(formData.get("summary") ?? "").trim();
+  const updateDate = String(formData.get("updateDate") ?? "").trim();
+
+  if (!projectId || !summary || !updateDate) return;
+  const status: ProjectStatus = projectStatuses.includes(statusRaw as ProjectStatus)
+    ? (statusRaw as ProjectStatus)
+    : "Development";
+
+  const db = await readDb();
+  const project = db.projects.find((item) => item.id === projectId && item.teamId === current.teamId);
+  if (!project) return;
+
+  project.progress = Math.max(0, Math.min(100, progress));
+  project.status = status;
+
+  db.dailyLogs.unshift({
+    id: makeId("d"),
     teamId: current.teamId,
     memberId: current.id,
-    reason: "Project update",
-    points: 8,
-    createdAt: new Date().toISOString()
+    date: updateDate,
+    projectName: project.title,
+    taskCompleted: summary,
+    timeSpentHours: asNumber(formData.get("timeSpentHours"), 0),
+    progressPercent: project.progress,
+    notes: String(formData.get("notes") ?? "").trim()
   });
 
   await writeDb(db);
   revalidatePath("/member/projects");
+  revalidatePath("/member/daily-logs");
   revalidatePath("/member");
   revalidatePath("/admin");
 }
@@ -171,15 +286,6 @@ export async function createDailyLogAction(formData: FormData): Promise<void> {
     timeSpentHours,
     progressPercent: Math.max(0, Math.min(100, progressPercent)),
     notes
-  });
-
-  db.points.push({
-    id: makeId("pt"),
-    teamId: current.teamId,
-    memberId: current.id,
-    reason: "Daily activity",
-    points: 5,
-    createdAt: new Date().toISOString()
   });
 
   await writeDb(db);
@@ -234,15 +340,6 @@ export async function createHackathonAction(formData: FormData): Promise<void> {
           : [current.id]
   });
 
-  db.points.push({
-    id: makeId("pt"),
-    teamId: current.teamId,
-    memberId: current.id,
-    reason: status === "Won" ? "Hackathon win" : "Hackathon participation",
-    points: status === "Won" ? 50 : 20,
-    createdAt: new Date().toISOString()
-  });
-
   await writeDb(db);
   revalidatePath("/member/hackathons");
   revalidatePath("/member");
@@ -276,4 +373,143 @@ export async function createFileAttachmentAction(formData: FormData): Promise<vo
   await writeDb(db);
   revalidatePath("/member/uploads");
   revalidatePath("/member");
+}
+
+export async function assignPointsAction(formData: FormData): Promise<void> {
+  const current = await getCurrentUser();
+  if (!current || current.role !== "admin") return;
+
+  const teamId = String(formData.get("teamId") ?? "").trim();
+  const memberId = String(formData.get("memberId") ?? "").trim();
+  const reason = String(formData.get("reason") ?? "").trim();
+  const points = asNumber(formData.get("points"), 0);
+
+  if (!teamId || !reason || points <= 0) return;
+
+  const db = await readDb();
+  db.points.unshift({
+    id: makeId("pt"),
+    teamId,
+    memberId: memberId || undefined,
+    reason,
+    points,
+    createdAt: new Date().toISOString(),
+    createdBy: current.id
+  });
+
+  await writeDb(db);
+  revalidatePath("/admin/leaderboard");
+  revalidatePath("/admin");
+}
+
+export async function createCheckpointAction(formData: FormData): Promise<void> {
+  const current = await getCurrentUser();
+  if (!current || current.role !== "admin") return;
+
+  const teamId = String(formData.get("teamId") ?? "").trim();
+  const title = String(formData.get("title") ?? "").trim();
+  const description = String(formData.get("description") ?? "").trim();
+  const dueDate = String(formData.get("dueDate") ?? "").trim();
+  const points = asNumber(formData.get("points"), 0);
+
+  if (!teamId || !title || !description || !dueDate || points <= 0) return;
+
+  const db = await readDb();
+  db.checkpoints.unshift({
+    id: makeId("cp"),
+    teamId,
+    title,
+    description,
+    dueDate,
+    points,
+    createdAt: new Date().toISOString(),
+    createdBy: current.id
+  });
+
+  await writeDb(db);
+  revalidatePath("/admin/checkpoints");
+  revalidatePath("/member/checkpoints");
+}
+
+export async function submitCheckpointAction(formData: FormData): Promise<void> {
+  const current = await getCurrentUser();
+  if (!current || current.role !== "member" || !current.teamId || !current.isTeamLeader) return;
+
+  const checkpointId = String(formData.get("checkpointId") ?? "").trim();
+  const evidence = String(formData.get("evidence") ?? "").trim();
+  const notes = String(formData.get("notes") ?? "").trim();
+
+  if (!checkpointId || !evidence) return;
+
+  const db = await readDb();
+  const checkpoint = db.checkpoints.find((item) => item.id === checkpointId && item.teamId === current.teamId);
+  if (!checkpoint) return;
+
+  const existing = db.checkpointSubmissions.find(
+    (item) => item.checkpointId === checkpointId && item.teamId === current.teamId
+  );
+
+  if (existing) {
+    existing.evidence = evidence;
+    existing.notes = notes;
+    existing.submittedAt = new Date().toISOString();
+    existing.status = "Pending";
+    existing.reviewedBy = undefined;
+    existing.reviewedAt = undefined;
+    existing.reviewNotes = undefined;
+  } else {
+    db.checkpointSubmissions.unshift({
+      id: makeId("cps"),
+      checkpointId,
+      teamId: current.teamId,
+      submittedBy: current.id,
+      evidence,
+      notes,
+      submittedAt: new Date().toISOString(),
+      status: "Pending"
+    });
+  }
+
+  await writeDb(db);
+  revalidatePath("/member/checkpoints");
+  revalidatePath("/admin/checkpoints");
+}
+
+export async function reviewCheckpointAction(formData: FormData): Promise<void> {
+  const current = await getCurrentUser();
+  if (!current || current.role !== "admin") return;
+
+  const submissionId = String(formData.get("submissionId") ?? "").trim();
+  const status = String(formData.get("status") ?? "").trim();
+  const reviewNotes = String(formData.get("reviewNotes") ?? "").trim();
+  if (!submissionId || (status !== "Approved" && status !== "Rejected")) return;
+
+  const db = await readDb();
+  const submission = db.checkpointSubmissions.find((item) => item.id === submissionId);
+  if (!submission) return;
+
+  const checkpoint = db.checkpoints.find((item) => item.id === submission.checkpointId);
+  if (!checkpoint) return;
+
+  submission.status = status;
+  submission.reviewedBy = current.id;
+  submission.reviewedAt = new Date().toISOString();
+  submission.reviewNotes = reviewNotes;
+
+  if (status === "Approved" && !submission.awardedPointId) {
+    const pointId = makeId("pt");
+    db.points.unshift({
+      id: pointId,
+      teamId: submission.teamId,
+      reason: `Checkpoint: ${checkpoint.title}`,
+      points: checkpoint.points,
+      createdAt: new Date().toISOString(),
+      createdBy: current.id
+    });
+    submission.awardedPointId = pointId;
+  }
+
+  await writeDb(db);
+  revalidatePath("/admin/checkpoints");
+  revalidatePath("/admin/leaderboard");
 }

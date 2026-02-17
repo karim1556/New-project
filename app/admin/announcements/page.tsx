@@ -4,11 +4,24 @@ import { readDb } from "@/lib/db";
 
 export default async function AdminAnnouncementsPage() {
   const db = await readDb();
+  const announcements = db.announcements
+    .slice()
+    .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1));
+  const critical = announcements.filter((item) => item.title.startsWith("[CRITICAL]"));
+  const normal = announcements.filter((item) => !item.title.startsWith("[CRITICAL]"));
 
   return (
     <>
       <Section title="Announcement Board" subtitle="Post notices visible to all teams and members.">
         <form action={createAnnouncementAction} className="grid-form single-col">
+          <label>
+            Importance
+            <select name="importance" defaultValue="normal">
+              <option value="normal">Normal</option>
+              <option value="reminder">Reminder</option>
+              <option value="critical">Critical</option>
+            </select>
+          </label>
           <label>
             Title
             <input name="title" placeholder="Internal hackathon on Friday" required />
@@ -21,9 +34,23 @@ export default async function AdminAnnouncementsPage() {
         </form>
       </Section>
 
+      <Section title="Critical Announcements">
+        <div className="notice-stack">
+          {critical.map((item) => (
+            <article key={item.id} className="notice-card notice-critical">
+              <span className="badge badge-critical">Critical</span>
+              <h3>{item.title.replace(/^\[CRITICAL\]\s*/, "")}</h3>
+              <p>{item.message}</p>
+              <small className="notice-meta">{new Date(item.createdAt).toLocaleString()}</small>
+            </article>
+          ))}
+          {critical.length === 0 ? <p className="muted">No critical announcements.</p> : null}
+        </div>
+      </Section>
+
       <Section title="Recent Announcements">
         <div className="notice-stack">
-          {db.announcements.map((item) => (
+          {normal.map((item) => (
             <article key={item.id} className="notice-card">
               <h3>{item.title}</h3>
               <p>{item.message}</p>

@@ -7,7 +7,8 @@ create table if not exists public.users (
   email text not null unique,
   password text not null,
   role text not null check (role in ('admin','member')),
-  "teamId" text null
+  "teamId" text null,
+  "isTeamLeader" boolean not null default false
 );
 
 create table if not exists public.teams (
@@ -84,15 +85,42 @@ create table if not exists public.points (
   "memberId" text null,
   reason text not null,
   points int not null,
-  "createdAt" text not null
+  "createdAt" text not null,
+  "createdBy" text null
+);
+
+create table if not exists public.checkpoints (
+  id text primary key,
+  "teamId" text not null,
+  title text not null,
+  description text not null,
+  "dueDate" text not null,
+  points int not null,
+  "createdAt" text not null,
+  "createdBy" text not null
+);
+
+create table if not exists public.checkpoint_submissions (
+  id text primary key,
+  "checkpointId" text not null,
+  "teamId" text not null,
+  "submittedBy" text not null,
+  evidence text not null,
+  notes text not null,
+  "submittedAt" text not null,
+  status text not null check (status in ('Pending','Approved','Rejected')),
+  "reviewedBy" text null,
+  "reviewedAt" text null,
+  "reviewNotes" text null,
+  "awardedPointId" text null
 );
 
 -- Seed data (optional)
-insert into public.users (id, name, email, password, role, "teamId") values
-('u_admin','Club Admin','admin@club.local','admin123','admin',null),
-('u_a1','Aarav Shah','aarav@club.local','member123','member','t_alpha'),
-('u_a2','Priya Iyer','priya@club.local','member123','member','t_alpha'),
-('u_b1','Rohan Mehta','rohan@club.local','member123','member','t_beta')
+insert into public.users (id, name, email, password, role, "teamId", "isTeamLeader") values
+('u_admin','Club Admin','admin@club.local','admin123','admin',null,false),
+('u_a1','Aarav Shah','aarav@club.local','member123','member','t_alpha',true),
+('u_a2','Priya Iyer','priya@club.local','member123','member','t_alpha',false),
+('u_b1','Rohan Mehta','rohan@club.local','member123','member','t_beta',true)
 on conflict (id) do nothing;
 
 insert into public.teams (id, name, "memberIds") values
@@ -125,7 +153,7 @@ insert into public.files (id, "teamId", "memberId", "targetType", "targetId", la
 ('f_1','t_alpha','u_a1','project','p_1','GitHub Repository','https://github.com/example/smart-campus-assistant','2026-02-16T15:30:00.000Z')
 on conflict (id) do nothing;
 
-insert into public.points (id, "teamId", "memberId", reason, points, "createdAt") values
-('pt_1','t_alpha',null,'Daily activity',10,'2026-02-16T16:00:00.000Z'),
-('pt_2','t_alpha','u_a1','Hackathon participation',20,'2026-02-16T16:05:00.000Z')
+insert into public.points (id, "teamId", "memberId", reason, points, "createdAt", "createdBy") values
+('pt_1','t_alpha',null,'Daily activity',10,'2026-02-16T16:00:00.000Z','u_admin'),
+('pt_2','t_alpha','u_a1','Hackathon participation',20,'2026-02-16T16:05:00.000Z','u_admin')
 on conflict (id) do nothing;

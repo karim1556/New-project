@@ -16,7 +16,8 @@ export function getDemoDb(): Database {
         email: "aarav@club.local",
         password: "member123",
         role: "member",
-        teamId: "t_alpha"
+        teamId: "t_alpha",
+        isTeamLeader: true
       },
       {
         id: "u_a2",
@@ -24,7 +25,8 @@ export function getDemoDb(): Database {
         email: "priya@club.local",
         password: "member123",
         role: "member",
-        teamId: "t_alpha"
+        teamId: "t_alpha",
+        isTeamLeader: false
       },
       {
         id: "u_b1",
@@ -32,7 +34,8 @@ export function getDemoDb(): Database {
         email: "rohan@club.local",
         password: "member123",
         role: "member",
-        teamId: "t_beta"
+        teamId: "t_beta",
+        isTeamLeader: true
       }
     ],
     teams: [
@@ -128,7 +131,8 @@ export function getDemoDb(): Database {
         teamId: "t_alpha",
         reason: "Daily activity",
         points: 10,
-        createdAt: "2026-02-16T16:00:00.000Z"
+        createdAt: "2026-02-16T16:00:00.000Z",
+        createdBy: "u_admin"
       },
       {
         id: "pt_2",
@@ -136,8 +140,11 @@ export function getDemoDb(): Database {
         memberId: "u_a1",
         reason: "Hackathon participation",
         points: 20,
-        createdAt: "2026-02-16T16:05:00.000Z"
+        createdAt: "2026-02-16T16:05:00.000Z",
+        createdBy: "u_admin"
       }
-    ]
+    ],
+    checkpoints: [],
+    checkpointSubmissions: []
   };
 }
