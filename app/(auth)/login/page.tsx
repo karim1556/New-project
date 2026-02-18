@@ -54,17 +54,8 @@ export default function LoginPage({
             <button type="submit">Login</button>
           </form>
 
-          <div className="login-demo">
-            <strong>Demo credentials</strong>
-            <p className="muted login-demo-copy">
-              Admin: admin@club.local / admin123
-              <br />
-              Member: aarav@club.local / member123
-            </p>
-          </div>
-
           <p className="muted login-note">
-            Need redirect check? <Link href="/">Go home</Link>
+            <Link href="/">&larr; Back to home</Link>
           </p>
         </section>
       </div>
