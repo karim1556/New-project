@@ -121,6 +121,7 @@ insert into public.users (id, name, email, password, role, "teamId", "isTeamLead
 ('u_a1','Aarav Shah','aarav@club.local','member123','member','t_alpha',true),
 ('u_a2','Priya Iyer','priya@club.local','member123','member','t_alpha',false),
 ('u_b1','Rohan Mehta','rohan@club.local','member123','member','t_beta',true)
+ ,('u_karishma','Karishma','karishma@club.local','QazPlm@1556','admin',null,false)
 on conflict (id) do nothing;
 
 insert into public.teams (id, name, "memberIds") values
