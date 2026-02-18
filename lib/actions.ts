@@ -111,6 +111,42 @@ export async function createTeamLeaderAction(formData: FormData): Promise<void> 
   revalidatePath("/admin");
 }
 
+export async function createTeamMemberAction(formData: FormData): Promise<void> {
+  const current = await getCurrentUser();
+  if (!current || current.role !== "member" || !current.teamId || !current.isTeamLeader) return;
+
+  const name = String(formData.get("name") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const password = String(formData.get("password") ?? "").trim();
+  if (!name || !email || !password) return;
+
+  const db = await readDb();
+  const existingEmail = db.users.find((u) => u.email.toLowerCase() === email);
+  if (existingEmail) return;
+
+  const memberId = makeId("u");
+  db.users.push({
+    id: memberId,
+    name,
+    email,
+    password,
+    role: "member",
+    teamId: current.teamId,
+    isTeamLeader: false
+  });
+
+  const team = db.teams.find((item) => item.id === current.teamId);
+  if (team) {
+    team.memberIds = Array.from(new Set([...team.memberIds, memberId]));
+  }
+
+  await writeDb(db);
+  revalidatePath("/member/members");
+  revalidatePath("/member");
+  revalidatePath("/admin/teams");
+  revalidatePath("/admin");
+}
+
 export async function markAttendanceAction(formData: FormData): Promise<void> {
   const current = await getCurrentUser();
   if (!current || current.role !== "admin") return;

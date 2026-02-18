@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 
 const memberNav = [
   { href: "/member", label: "Team Dashboard" },
+  { href: "/member/members", label: "Team Members" },
   { href: "/member/projects", label: "Projects" },
   { href: "/member/daily-logs", label: "Daily Logs" },
   { href: "/member/hackathons", label: "Hackathons" },

@@ -23,25 +23,43 @@ export async function supabaseRequest<T>(
   const query = init.query ? `?${init.query}` : "";
   const endpoint = `${url}/rest/v1/${table}${query}`;
 
-  const response = await fetch(endpoint, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      apikey: key,
-      Authorization: `Bearer ${key}`,
-      ...(init.headers ?? {})
-    },
-    cache: "no-store"
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+
+  let response: Response;
+  try {
+    response = await fetch(endpoint, {
+      ...init,
+      signal: controller.signal,
+      headers: {
+        "Content-Type": "application/json",
+        apikey: key,
+        Authorization: `Bearer ${key}`,
+        ...(init.headers ?? {})
+      },
+      cache: "no-store"
+    });
+  } finally {
+    clearTimeout(timeout);
+  }
+
+  const raw = await response.text();
 
   if (!response.ok) {
-    const text = await response.text();
-    throw new Error(`Supabase ${table} request failed: ${response.status} ${text}`);
+    throw new Error(`Supabase ${table} request failed: ${response.status} ${raw}`);
   }
 
   if (response.status === 204) {
     return [] as T;
   }
 
-  return (await response.json()) as T;
+  if (!raw || raw.trim() === "") {
+    return [] as T;
+  }
+
+  try {
+    return JSON.parse(raw) as T;
+  } catch (err) {
+    throw new Error(`Failed to parse Supabase ${table} response JSON: ${String(err)}`);
+  }
 }

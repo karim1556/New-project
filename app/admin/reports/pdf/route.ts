@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSession } from "@/lib/auth";
 import { getWeeklyReport } from "@/lib/queries";
-import { buildSimplePdf } from "@/lib/pdf";
+import { buildCorporateReportPdf } from "@/lib/pdf";
 
 export async function GET() {
   const session = getSession();
@@ -10,25 +10,16 @@ export async function GET() {
   }
 
   const report = await getWeeklyReport();
-  const lines: string[] = [
-    `Generated: ${new Date().toLocaleString()}`,
-    "",
-    `Most Active Team: ${report.mostActiveTeam}`,
-    `Tasks Completed: ${report.tasksCompleted}`,
-    `Attendance: ${report.attendancePct}%`,
-    `Hackathons Participated: ${report.hackathonsParticipated}`,
-    `Top Contributor: ${report.topContributor}`,
-    "",
-    "Team Breakdown:",
-    ...report.teamPerformance.map(
-      (t) => `${t.teamName} | tasks=${t.tasksCompleted} | attendance=${t.attendancePct}% | hackathons=${t.hackathons}`
-    ),
-    "",
-    "Top Member Activity:",
-    ...report.memberPerformance.map((m) => `${m.memberName} (${m.teamName}) logs=${m.logsCount}`)
-  ];
-
-  const pdf = buildSimplePdf("Weekly Hackathon Club Report", lines);
+  const pdf = buildCorporateReportPdf({
+    generatedAt: new Date().toLocaleString(),
+    mostActiveTeam: report.mostActiveTeam,
+    tasksCompleted: report.tasksCompleted,
+    attendancePct: report.attendancePct,
+    hackathonsParticipated: report.hackathonsParticipated,
+    topContributor: report.topContributor,
+    teamPerformance: report.teamPerformance,
+    memberPerformance: report.memberPerformance
+  });
 
   return new NextResponse(pdf, {
     status: 200,
