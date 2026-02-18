@@ -3,6 +3,34 @@ import { hasSupabaseConfig, supabaseRequest } from "@/lib/supabase";
 import { getDemoDb } from "@/lib/seed";
 
 type TableData<T> = T[];
+type DbTableKey = keyof Pick<
+  Database,
+  | "users"
+  | "teams"
+  | "projects"
+  | "dailyLogs"
+  | "hackathons"
+  | "attendance"
+  | "announcements"
+  | "files"
+  | "points"
+  | "checkpoints"
+  | "checkpointSubmissions"
+>;
+
+const tableNameByKey: Record<DbTableKey, string> = {
+  users: "users",
+  teams: "teams",
+  projects: "projects",
+  dailyLogs: "daily_logs",
+  hackathons: "hackathons",
+  attendance: "attendance",
+  announcements: "announcements",
+  files: "files",
+  points: "points",
+  checkpoints: "checkpoints",
+  checkpointSubmissions: "checkpoint_submissions"
+};
 
 export async function readDb(): Promise<Database> {
   if (!hasSupabaseConfig()) {
@@ -67,7 +95,7 @@ export async function readDb(): Promise<Database> {
   }
 }
 
-export async function writeDb(db: Database): Promise<void> {
+export async function writeDb(db: Database, tables?: DbTableKey[]): Promise<void> {
   if (!hasSupabaseConfig()) {
     // Demo mode without Supabase: no persistence.
     return;
@@ -84,25 +112,49 @@ export async function writeDb(db: Database): Promise<void> {
     });
 
     if (rows.length > 0) {
+      // Supabase/PostgREST requires all objects in a bulk insert to have the same keys.
+      // Normalize rows so every object contains the same set of keys (missing keys set to null).
+      const allKeys = new Set<string>();
+      rows.forEach((r) => Object.keys(r as any).forEach((k) => allKeys.add(k)));
+      const keys = Array.from(allKeys);
+
+      const normalized = rows.map((r) => {
+        const obj: Record<string, unknown> = {};
+        for (const k of keys) {
+          // If property exists on the row, keep it, otherwise set explicit null
+          obj[k] = Object.prototype.hasOwnProperty.call(r as any, k) ? (r as any)[k] : null;
+        }
+        return obj;
+      });
+
       await supabaseRequest<unknown>(table, {
         method: "POST",
-        body: JSON.stringify(rows),
+        body: JSON.stringify(normalized),
         headers: { Prefer: "return=minimal" }
       });
     }
   }
 
-  await replaceTable("users", db.users);
-  await replaceTable("teams", db.teams);
-  await replaceTable("projects", db.projects);
-  await replaceTable("daily_logs", db.dailyLogs);
-  await replaceTable("hackathons", db.hackathons);
-  await replaceTable("attendance", db.attendance);
-  await replaceTable("announcements", db.announcements);
-  await replaceTable("files", db.files);
-  await replaceTable("points", db.points);
-  await replaceTable("checkpoints", db.checkpoints);
-  await replaceTable("checkpoint_submissions", db.checkpointSubmissions);
+  const targetTables: DbTableKey[] =
+    tables && tables.length > 0
+      ? tables
+      : [
+          "users",
+          "teams",
+          "projects",
+          "dailyLogs",
+          "hackathons",
+          "attendance",
+          "announcements",
+          "files",
+          "points",
+          "checkpoints",
+          "checkpointSubmissions"
+        ];
+
+  for (const table of targetTables) {
+    await replaceTable(tableNameByKey[table], db[table] as TableData<{ id: string }>);
+  }
 }
 
 export function makeId(prefix: string): string {

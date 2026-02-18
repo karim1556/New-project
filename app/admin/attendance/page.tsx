@@ -1,6 +1,7 @@
 import { Section } from "@/components/section";
 import { markAttendanceAction } from "@/lib/actions";
 import { readDb } from "@/lib/db";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function AttendancePage() {
   const db = await readDb();
@@ -46,7 +47,7 @@ export default async function AttendancePage() {
             ))}
           </div>
 
-          <button type="submit">Save Attendance</button>
+          <SubmitButton label="Save Attendance" pendingLabel="Saving attendance..." />
         </form>
       </Section>
 

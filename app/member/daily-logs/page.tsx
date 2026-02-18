@@ -2,6 +2,7 @@ import { Section } from "@/components/section";
 import { createDailyLogAction } from "@/lib/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { readDb } from "@/lib/db";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function DailyLogsPage() {
   const current = await getCurrentUser();
@@ -39,7 +40,7 @@ export default async function DailyLogsPage() {
             Notes
             <textarea name="notes" />
           </label>
-          <button type="submit">Submit Daily Log</button>
+          <SubmitButton label="Submit Daily Log" pendingLabel="Submitting..." />
         </form>
       </Section>
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { loginAction } from "@/lib/actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export default function LoginPage({
   searchParams
@@ -51,7 +52,7 @@ export default function LoginPage({
               Password
               <input name="password" type="password" required />
             </label>
-            <button type="submit">Login</button>
+            <SubmitButton label="Login" pendingLabel="Signing in..." />
           </form>
 
           <p className="muted login-note">

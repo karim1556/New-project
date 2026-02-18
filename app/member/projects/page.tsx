@@ -3,6 +3,7 @@ import { createProjectAction, updateProjectProgressAction } from "@/lib/actions"
 import { projectStatuses } from "@/lib/constants";
 import { getCurrentUser } from "@/lib/auth";
 import { readDb } from "@/lib/db";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function ProjectsPage() {
   const current = await getCurrentUser();
@@ -63,7 +64,7 @@ export default async function ProjectsPage() {
             Description
             <textarea name="description" required />
           </label>
-          <button type="submit">Create Project</button>
+          <SubmitButton label="Create Project" pendingLabel="Creating..." />
         </form>
       </Section>
 
@@ -115,7 +116,7 @@ export default async function ProjectsPage() {
             Notes
             <textarea name="notes" placeholder="Blockers, dependencies, next steps" />
           </label>
-          <button type="submit">Save Project Update</button>
+          <SubmitButton label="Save Project Update" pendingLabel="Saving update..." />
         </form>
       </Section>
 

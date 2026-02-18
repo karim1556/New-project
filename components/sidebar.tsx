@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { logoutAction } from "@/lib/actions";
+import { SubmitButton } from "@/components/submit-button";
 
 type SidebarItem = {
   href: string;
@@ -31,9 +32,7 @@ export function Sidebar({
         ))}
       </nav>
       <form action={logoutAction} className="logout-form">
-        <button className="secondary" type="submit">
-          Logout
-        </button>
+        <SubmitButton className="secondary" label="Logout" pendingLabel="Logging out..." />
       </form>
     </aside>
   );

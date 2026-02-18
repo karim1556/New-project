@@ -2,6 +2,7 @@ import { Section } from "@/components/section";
 import { createTeamMemberAction } from "@/lib/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { readDb } from "@/lib/db";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function MemberManagementPage() {
   const current = await getCurrentUser();
@@ -31,7 +32,7 @@ export default async function MemberManagementPage() {
             <input name="password" type="text" required />
           </label>
           <div className="form-actions">
-            <button type="submit">Add Team Member</button>
+            <SubmitButton label="Add Team Member" pendingLabel="Adding..." />
           </div>
         </form>
       </Section>

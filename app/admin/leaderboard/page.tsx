@@ -2,6 +2,7 @@ import { Section } from "@/components/section";
 import { assignPointsAction } from "@/lib/actions";
 import { getLeaderboard } from "@/lib/queries";
 import { readDb } from "@/lib/db";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function LeaderboardPage() {
   const { teamRanking, memberRanking } = await getLeaderboard();
@@ -46,7 +47,7 @@ export default async function LeaderboardPage() {
             <input name="reason" placeholder="Sprint completion / checkpoint approval" required />
           </label>
           <div className="form-actions">
-            <button type="submit">Assign Points</button>
+            <SubmitButton label="Assign Points" pendingLabel="Assigning..." />
           </div>
         </form>
       </Section>

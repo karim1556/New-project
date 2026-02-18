@@ -1,6 +1,7 @@
 import { Section } from "@/components/section";
 import { createTeamAction, createTeamLeaderAction } from "@/lib/actions";
 import { readDb } from "@/lib/db";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function TeamManagementPage() {
   const db = await readDb();
@@ -14,7 +15,7 @@ export default async function TeamManagementPage() {
             <input name="name" placeholder="Team Quantum" required />
           </label>
           <div className="form-actions">
-            <button type="submit">Create Team</button>
+            <SubmitButton label="Create Team" pendingLabel="Creating..." />
           </div>
         </form>
       </Section>
@@ -50,7 +51,7 @@ export default async function TeamManagementPage() {
             <input name="leaderPassword" type="text" required />
           </label>
           <div className="form-actions">
-            <button type="submit">Create / Update Leader Login</button>
+            <SubmitButton label="Create / Update Leader Login" pendingLabel="Saving..." />
           </div>
         </form>
       </Section>

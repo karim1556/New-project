@@ -3,6 +3,7 @@ import { createHackathonAction } from "@/lib/actions";
 import { hackathonStatuses } from "@/lib/constants";
 import { getCurrentUser } from "@/lib/auth";
 import { readDb } from "@/lib/db";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function HackathonsPage() {
   const current = await getCurrentUser();
@@ -47,7 +48,7 @@ export default async function HackathonsPage() {
             Result or notes
             <textarea name="resultNotes" />
           </label>
-          <button type="submit">Save Hackathon Entry</button>
+          <SubmitButton label="Save Hackathon Entry" pendingLabel="Saving..." />
         </form>
       </Section>
 

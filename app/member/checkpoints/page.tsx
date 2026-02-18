@@ -2,6 +2,7 @@ import { Section } from "@/components/section";
 import { submitCheckpointAction } from "@/lib/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { readDb } from "@/lib/db";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function MemberCheckpointsPage() {
   const current = await getCurrentUser();
@@ -38,7 +39,7 @@ export default async function MemberCheckpointsPage() {
             <textarea name="notes" placeholder="What exactly was completed" />
           </label>
           <div className="form-actions">
-            <button type="submit">Submit for Review</button>
+            <SubmitButton label="Submit for Review" pendingLabel="Submitting..." />
           </div>
         </form>
       </Section>

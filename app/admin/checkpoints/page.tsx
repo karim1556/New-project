@@ -1,6 +1,7 @@
 import { Section } from "@/components/section";
 import { createCheckpointAction, reviewCheckpointAction } from "@/lib/actions";
 import { readDb } from "@/lib/db";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function AdminCheckpointsPage() {
   const db = await readDb();
@@ -46,7 +47,7 @@ export default async function AdminCheckpointsPage() {
             />
           </label>
           <div className="form-actions">
-            <button type="submit">Create Checkpoint</button>
+            <SubmitButton label="Create Checkpoint" pendingLabel="Creating..." />
           </div>
         </form>
       </Section>
@@ -109,7 +110,7 @@ export default async function AdminCheckpointsPage() {
                     <input name="reviewNotes" defaultValue={submission.reviewNotes ?? ""} />
                   </label>
                   <div className="form-actions">
-                    <button type="submit">Save Review</button>
+                    <SubmitButton label="Save Review" pendingLabel="Saving..." />
                   </div>
                 </form>
               </article>

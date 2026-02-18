@@ -69,6 +69,26 @@ main {
   gap: 0.95rem;
 }
 
+.toast-banner {
+  border-radius: 12px;
+  padding: 0.68rem 0.86rem;
+  font-size: 0.9rem;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-sm);
+}
+
+.toast-success {
+  background: rgba(16, 185, 129, 0.12);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: #065f46;
+}
+
+.toast-error {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #991b1b;
+}
+
 .shell-topbar {
   display: flex;
   align-items: flex-end;
@@ -322,6 +342,12 @@ button {
 button:hover {
   transform: translateY(-1px);
   opacity: 0.9;
+}
+
+button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
 }
 
 button.secondary {

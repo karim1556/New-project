@@ -1,6 +1,7 @@
 import { Section } from "@/components/section";
 import { createAnnouncementAction } from "@/lib/actions";
 import { readDb } from "@/lib/db";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function AdminAnnouncementsPage() {
   const db = await readDb();
@@ -30,7 +31,7 @@ export default async function AdminAnnouncementsPage() {
             Message
             <textarea name="message" placeholder="Share full instruction and deadlines" required />
           </label>
-          <button type="submit">Post Announcement</button>
+          <SubmitButton label="Post Announcement" pendingLabel="Posting..." />
         </form>
       </Section>
 

@@ -2,6 +2,7 @@ import { Section } from "@/components/section";
 import { createFileAttachmentAction } from "@/lib/actions";
 import { getCurrentUser } from "@/lib/auth";
 import { readDb } from "@/lib/db";
+import { SubmitButton } from "@/components/submit-button";
 
 export default async function FileUploadsPage() {
   const current = await getCurrentUser();
@@ -42,7 +43,7 @@ export default async function FileUploadsPage() {
             URL
             <input name="fileUrl" type="url" required />
           </label>
-          <button type="submit">Attach File Link</button>
+          <SubmitButton label="Attach File Link" pendingLabel="Attaching..." />
         </form>
       </Section>
 
