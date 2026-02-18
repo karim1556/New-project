@@ -3,6 +3,7 @@ import { AppShell } from "@/components/app-shell";
 
 const adminNav = [
   { href: "/admin", label: "Dashboard" },
+  { href: "/admin/team-workforce", label: "Team Workforce" },
   { href: "/admin/teams", label: "Team Management" },
   { href: "/admin/attendance", label: "Attendance" },
   { href: "/admin/announcements", label: "Announcements" },

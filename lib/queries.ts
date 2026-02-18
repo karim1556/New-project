@@ -71,6 +71,56 @@ export async function getLeaderboard() {
   return { teamRanking, memberRanking };
 }
 
+export async function getTeamWorkforceOverview() {
+  const db = await readDb();
+  const members = db.users.filter((user) => user.role === "member" && user.teamId);
+
+  const membersByTeam = db.teams.map((team) => {
+    const teamMembers = members
+      .filter((member) => member.teamId === team.id)
+      .map((member) => {
+        const memberLogs = db.dailyLogs
+          .filter((log) => log.memberId === member.id)
+          .sort((a, b) => (a.date < b.date ? 1 : -1));
+        const teamActiveProjects = db.projects
+          .filter((project) => project.teamId === team.id && project.status !== "Completed")
+          .sort((a, b) => (a.startDate < b.startDate ? 1 : -1));
+        const attendanceRows = db.attendance
+          .filter((record) => record.memberId === member.id)
+          .sort((a, b) => (a.date < b.date ? 1 : -1));
+
+        const totalAttendance = attendanceRows.length;
+        const presentDays = attendanceRows.filter((record) => record.present).length;
+        const attendancePct = totalAttendance ? Math.round((presentDays / totalAttendance) * 100) : 0;
+        const latestAttendance = attendanceRows[0];
+
+        return {
+          memberId: member.id,
+          memberName: member.name,
+          currentProject: memberLogs[0]?.projectName ?? teamActiveProjects[0]?.title ?? "No active project",
+          attendancePct,
+          presentDays,
+          totalAttendance,
+          lastAttendanceDate: latestAttendance?.date ?? "-",
+          lastAttendanceStatus: latestAttendance ? (latestAttendance.present ? "Present" : "Absent") : "No record"
+        };
+      })
+      .sort((a, b) => a.memberName.localeCompare(b.memberName));
+
+    return {
+      teamId: team.id,
+      teamName: team.name,
+      members: teamMembers
+    };
+  });
+
+  return {
+    totalTeams: db.teams.length,
+    totalMembers: members.length,
+    teams: membersByTeam
+  };
+}
+
 export async function getWeeklyReport() {
   const db = await readDb();
   const now = new Date();

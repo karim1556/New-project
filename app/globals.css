@@ -377,6 +377,11 @@ button.secondary {
   color: #f87171;
 }
 
+.badge.badge-muted {
+  background: rgba(107, 122, 148, 0.18);
+  color: #a4b2ca;
+}
+
 .notice-stack {
   display: grid;
   gap: 0.68rem;
