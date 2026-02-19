@@ -1,5 +1,6 @@
 "use server";
 
+import { randomUUID } from "crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { clearSession, getCurrentUser, setSession } from "@/lib/auth";
@@ -51,7 +52,7 @@ export async function createTeamAction(formData: FormData): Promise<void> {
   }
 
   const db = await readDb();
-  db.teams.push({ id: makeId("t"), name, memberIds: [] });
+  db.teams.push({ id: `t_${randomUUID()}`, name, memberIds: [] });
   await writeDb(db, ["teams"]);
   revalidatePath("/admin/teams");
   revalidatePath("/admin");
@@ -101,7 +102,7 @@ export async function createTeamLeaderAction(formData: FormData): Promise<void> 
     userByEmail.isTeamLeader = true;
     team.memberIds = Array.from(new Set([...team.memberIds, userByEmail.id]));
   } else {
-    const leaderId = makeId("u");
+    const leaderId = `u_${randomUUID()}`;
     db.users.push({
       id: leaderId,
       name: leaderName,
