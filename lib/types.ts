@@ -42,7 +42,7 @@ export type DailyLog = {
   notes: string;
 };
 
-export type HackathonStatus = "Registered" | "In progress" | "Submitted" | "Won" | "Lost";
+export type HackathonStatus = "Registered" | "PPT Submitted" | "Shortlisted" | "Round 1" | "Round 2" | "Winner";
 
 export type HackathonEntry = {
   id: string;

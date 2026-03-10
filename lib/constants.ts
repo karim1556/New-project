@@ -10,8 +10,9 @@ export const projectStatuses: ProjectStatus[] = [
 
 export const hackathonStatuses: HackathonStatus[] = [
   "Registered",
-  "In progress",
-  "Submitted",
-  "Won",
-  "Lost"
+  "PPT Submitted",
+  "Shortlisted",
+  "Round 1",
+  "Round 2",
+  "Winner"
 ];

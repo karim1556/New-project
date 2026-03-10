@@ -389,54 +389,67 @@ export async function createHackathonAction(formData: FormData): Promise<void> {
   }
 
   const hackathonName = String(formData.get("hackathonName") ?? "").trim();
-  const platform = String(formData.get("platform") ?? "").trim();
-  const date = String(formData.get("date") ?? "").trim();
-  const statusRaw = String(formData.get("status") ?? "Registered");
-  const resultNotes = String(formData.get("resultNotes") ?? "").trim();
-  const memberCsv = String(formData.get("participantIds") ?? "").trim();
+  const resultNotes = String(formData.get("notes") ?? "").trim();
 
-  if (!hackathonName || !platform || !date) {
-    toastError("Hackathon name, platform and date are required.", "/member/hackathons");
+  if (!hackathonName) {
+    toastError("Hackathon name is required.", "/member/hackathons");
   }
 
-  const status: HackathonStatus = hackathonStatuses.includes(statusRaw as HackathonStatus)
-    ? (statusRaw as HackathonStatus)
-    : "Registered";
-  const participantIds = memberCsv
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
+  const today = new Date().toISOString().split("T")[0];
 
   const db = await readDb();
-  const teamMemberIds = db.users
-    .filter((u) => u.role === "member" && u.teamId === current.teamId)
-    .map((u) => u.id);
-
-  const sanitizedParticipants = Array.from(new Set(participantIds)).filter((id) =>
-    teamMemberIds.includes(id)
-  );
+  const teamMemberIds = db.teams.find((t) => t.id === current.teamId)?.memberIds ?? [current.id];
 
   db.hackathons.unshift({
     id: makeId("h"),
-    teamId: current.teamId,
+    teamId: current.teamId!,
     hackathonName,
-    platform,
-    date,
-    status,
+    platform: "",
+    date: today,
+    status: "Registered",
     resultNotes,
-    participatingMemberIds:
-      sanitizedParticipants.length > 0
-        ? sanitizedParticipants
-        : current.teamId
-          ? db.teams.find((t) => t.id === current.teamId)?.memberIds ?? [current.id]
-          : [current.id]
+    participatingMemberIds: teamMemberIds
   });
 
   await writeDb(db, ["hackathons"]);
   revalidatePath("/member/hackathons");
   revalidatePath("/member");
   revalidatePath("/admin");
-  toastSuccess("Hackathon entry saved.", "/member/hackathons");
+  toastSuccess("Hackathon registered.", "/member/hackathons");
+}
+
+export async function updateHackathonStatusAction(formData: FormData): Promise<void> {
+  const current = await getCurrentUser();
+  if (!current || current.role !== "member" || !current.teamId) {
+    toastError("Unauthorized request.", "/member/hackathons");
+  }
+
+  const id = String(formData.get("id") ?? "").trim();
+  const statusRaw = String(formData.get("status") ?? "").trim();
+  const resultNotes = String(formData.get("notes") ?? "").trim();
+
+  if (!id) {
+    toastError("Invalid hackathon entry.", "/member/hackathons");
+  }
+
+  const status: HackathonStatus = hackathonStatuses.includes(statusRaw as HackathonStatus)
+    ? (statusRaw as HackathonStatus)
+    : "Registered";
+
+  const db = await readDb();
+  const entry = db.hackathons.find((h) => h.id === id && h.teamId === current.teamId);
+  if (!entry) {
+    toastError("Entry not found.", "/member/hackathons");
+  }
+
+  entry!.status = status;
+  entry!.resultNotes = resultNotes;
+
+  await writeDb(db, ["hackathons"]);
+  revalidatePath("/member/hackathons");
+  revalidatePath("/member");
+  revalidatePath("/admin");
+  toastSuccess("Status updated.", "/member/hackathons");
 }
 
 export async function createFileAttachmentAction(formData: FormData): Promise<void> {
