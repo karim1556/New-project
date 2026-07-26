@@ -11,6 +11,13 @@ export function getDemoDb(): Database {
         role: "admin"
       },
       {
+        id: "u_karishma",
+        name: "Karishma",
+        email: "karishma@club.local",
+        password: "QazPlm@1556",
+        role: "admin"
+      },
+      {
         id: "u_a1",
         name: "Aarav Shah",
         email: "aarav@club.local",

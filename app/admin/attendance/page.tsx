@@ -5,7 +5,7 @@ import { SubmitButton } from "@/components/submit-button";
 
 export default async function AttendancePage() {
   const db = await readDb();
-  const members = db.users.filter((u) => u.role === "member" && u.teamId);
+  const members = db.users.filter((u) => u.role === "member");
 
   return (
     <>

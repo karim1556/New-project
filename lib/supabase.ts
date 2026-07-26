@@ -12,7 +12,14 @@ function getSupabaseConfig() {
 }
 
 export function hasSupabaseConfig(): boolean {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !key) return false;
+  if (url.includes("your-project-id") || key.includes("your-supabase-service-role-key")) return false;
+  if (!url.startsWith("http://") && !url.startsWith("https://")) return false;
+
+  return true;
 }
 
 export async function supabaseRequest<T>(

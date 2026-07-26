@@ -83,6 +83,21 @@ export default async function TeamManagementPage() {
                   </tr>
                 );
               })}
+              {(() => {
+                const knownTeamIds = new Set(db.teams.map((t) => t.id));
+                const unassigned = db.users.filter(
+                  (u) => u.role === "member" && (!u.teamId || !knownTeamIds.has(u.teamId))
+                );
+                if (unassigned.length === 0) return null;
+                return (
+                  <tr key="unassigned">
+                    <td>Unassigned Members ({unassigned.length})</td>
+                    <td>-</td>
+                    <td>{unassigned.map((m) => m.name).join(", ")}</td>
+                    <td>0</td>
+                  </tr>
+                );
+              })()}
             </tbody>
           </table>
         </div>

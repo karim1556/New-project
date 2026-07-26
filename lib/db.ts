@@ -32,8 +32,11 @@ const tableNameByKey: Record<DbTableKey, string> = {
   checkpointSubmissions: "checkpoint_submissions"
 };
 
+let isDemoFallback = false;
+
 export async function readDb(): Promise<Database> {
   if (!hasSupabaseConfig()) {
+    isDemoFallback = true;
     return getDemoDb();
   }
 
@@ -70,69 +73,58 @@ export async function readDb(): Promise<Database> {
       })
     ]);
 
-    const db = {
-      users,
-      teams,
-      projects,
-      dailyLogs,
-      hackathons,
-      attendance,
-      announcements,
-      files,
-      points,
-      checkpoints,
-      checkpointSubmissions
+    isDemoFallback = false;
+
+    return {
+      users: users ?? [],
+      teams: teams ?? [],
+      projects: projects ?? [],
+      dailyLogs: dailyLogs ?? [],
+      hackathons: hackathons ?? [],
+      attendance: attendance ?? [],
+      announcements: announcements ?? [],
+      files: files ?? [],
+      points: points ?? [],
+      checkpoints: checkpoints ?? [],
+      checkpointSubmissions: checkpointSubmissions ?? []
     };
-
-    // If Supabase is connected but unseeded, keep demo login and UI usable.
-    if (db.users.length === 0) {
-      return getDemoDb();
-    }
-
-    return db;
-  } catch {
+  } catch (err) {
+    console.error("Supabase readDb connection failed, falling back to demo DB:", err);
+    isDemoFallback = true;
     return getDemoDb();
   }
 }
 
 export async function writeDb(db: Database, tables?: DbTableKey[]): Promise<void> {
-  if (!hasSupabaseConfig()) {
-    // Demo mode without Supabase: no persistence.
+  if (!hasSupabaseConfig() || isDemoFallback) {
+    // Demo mode or fallback: do not overwrite Supabase DB
     return;
   }
 
-  async function replaceTable<T extends { id: string }>(
+  async function upsertTable<T extends { id: string }>(
     table: string,
     rows: TableData<T>
   ): Promise<void> {
-    await supabaseRequest<unknown>(table, {
-      method: "DELETE",
-      query: "id=not.is.null",
-      headers: { Prefer: "return=minimal" }
+    if (!rows || rows.length === 0) return;
+
+    const allKeys = new Set<string>();
+    rows.forEach((r) => Object.keys(r as any).forEach((k) => allKeys.add(k)));
+    const keys = Array.from(allKeys);
+
+    const normalized = rows.map((r) => {
+      const obj: Record<string, unknown> = {};
+      for (const k of keys) {
+        obj[k] = Object.prototype.hasOwnProperty.call(r as any, k) ? (r as any)[k] : null;
+      }
+      return obj;
     });
 
-    if (rows.length > 0) {
-      // Supabase/PostgREST requires all objects in a bulk insert to have the same keys.
-      // Normalize rows so every object contains the same set of keys (missing keys set to null).
-      const allKeys = new Set<string>();
-      rows.forEach((r) => Object.keys(r as any).forEach((k) => allKeys.add(k)));
-      const keys = Array.from(allKeys);
-
-      const normalized = rows.map((r) => {
-        const obj: Record<string, unknown> = {};
-        for (const k of keys) {
-          // If property exists on the row, keep it, otherwise set explicit null
-          obj[k] = Object.prototype.hasOwnProperty.call(r as any, k) ? (r as any)[k] : null;
-        }
-        return obj;
-      });
-
-      await supabaseRequest<unknown>(table, {
-        method: "POST",
-        body: JSON.stringify(normalized),
-        headers: { Prefer: "return=minimal" }
-      });
-    }
+    await supabaseRequest<unknown>(table, {
+      method: "POST",
+      query: "on_conflict=id",
+      body: JSON.stringify(normalized),
+      headers: { Prefer: "resolution=merge-duplicates,return=minimal" }
+    });
   }
 
   const targetTables: DbTableKey[] =
@@ -153,7 +145,7 @@ export async function writeDb(db: Database, tables?: DbTableKey[]): Promise<void
         ];
 
   for (const table of targetTables) {
-    await replaceTable(tableNameByKey[table], db[table] as TableData<{ id: string }>);
+    await upsertTable(tableNameByKey[table], db[table] as TableData<{ id: string }>);
   }
 }
 
