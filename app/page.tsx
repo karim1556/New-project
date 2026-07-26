@@ -319,7 +319,7 @@ export default function HomePage({
 
       {/* Footer */}
       <footer className="reg-footer">
-        <p>© 2026 Hackathon Club • College of Engineering &amp; Technology</p>
+        <p>© 2026 Hackathon Club • VPPCOE</p>
       </footer>
     </div>
   );
