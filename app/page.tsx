@@ -65,11 +65,11 @@ export default function HomePage({
               <h3 className="contacts-title">Have questions or need assistance? Contact our team:</h3>
               <div className="contacts-grid">
                 <div className="contact-card">
-                  <div className="contact-role">Club President / Lead</div>
-                  <div className="contact-name">President Office</div>
-                  <div className="contact-phone">+91 98765 43210</div>
+                  <div className="contact-role">Student Incharge</div>
+                  <div className="contact-name">Student Incharge</div>
+                  <div className="contact-phone">+91 9004667948</div>
                   <a
-                    href="https://wa.me/919876543210?text=Hi!%20I%20have%20a%20query%20regarding%20Hackathon%20Club%202026%20registration."
+                    href="https://wa.me/919004667948?text=Hi!%20I%20have%20a%20query%20regarding%20Hackathon%20Club%202026%20registration."
                     target="_blank"
                     rel="noreferrer"
                     className="wa-button"
@@ -79,11 +79,11 @@ export default function HomePage({
                 </div>
 
                 <div className="contact-card">
-                  <div className="contact-role">Technical Lead / Support</div>
-                  <div className="contact-name">Tech Support Team</div>
-                  <div className="contact-phone">+91 91234 56789</div>
+                  <div className="contact-role">Faculty Incharge</div>
+                  <div className="contact-name">Faculty Incharge</div>
+                  <div className="contact-phone">+91 72639 31321</div>
                   <a
-                    href="https://wa.me/919123456789?text=Hi!%20I%20have%20a%20technical%20query%20regarding%20Hackathon%20Club%202026."
+                    href="https://wa.me/917263931321?text=Hi!%20I%20have%20a%20query%20regarding%20Hackathon%20Club%202026%20registration."
                     target="_blank"
                     rel="noreferrer"
                     className="wa-button wa-button-alt"
@@ -92,12 +92,6 @@ export default function HomePage({
                   </a>
                 </div>
               </div>
-            </div>
-
-            <div className="thankyou-actions">
-              <Link href="/" className="btn-secondary-glow">
-                Submit Another Response
-              </Link>
             </div>
           </div>
         ) : (
