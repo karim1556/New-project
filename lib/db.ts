@@ -16,6 +16,7 @@ type DbTableKey = keyof Pick<
   | "points"
   | "checkpoints"
   | "checkpointSubmissions"
+  | "clubRegistrations"
 >;
 
 const tableNameByKey: Record<DbTableKey, string> = {
@@ -29,7 +30,8 @@ const tableNameByKey: Record<DbTableKey, string> = {
   files: "files",
   points: "points",
   checkpoints: "checkpoints",
-  checkpointSubmissions: "checkpoint_submissions"
+  checkpointSubmissions: "checkpoint_submissions",
+  clubRegistrations: "club_registrations"
 };
 
 let isDemoFallback = false;
@@ -52,7 +54,8 @@ export async function readDb(): Promise<Database> {
       files,
       points,
       checkpoints,
-      checkpointSubmissions
+      checkpointSubmissions,
+      clubRegistrations
     ] = await Promise.all([
       supabaseRequest<Database["users"]>("users", { method: "GET", query: "select=*" }),
       supabaseRequest<Database["teams"]>("teams", { method: "GET", query: "select=*" }),
@@ -70,7 +73,11 @@ export async function readDb(): Promise<Database> {
       supabaseRequest<Database["checkpointSubmissions"]>("checkpoint_submissions", {
         method: "GET",
         query: "select=*"
-      })
+      }),
+      supabaseRequest<NonNullable<Database["clubRegistrations"]>>("club_registrations", {
+        method: "GET",
+        query: "select=*"
+      }).catch(() => [])
     ]);
 
     isDemoFallback = false;
@@ -86,7 +93,8 @@ export async function readDb(): Promise<Database> {
       files: files ?? [],
       points: points ?? [],
       checkpoints: checkpoints ?? [],
-      checkpointSubmissions: checkpointSubmissions ?? []
+      checkpointSubmissions: checkpointSubmissions ?? [],
+      clubRegistrations: clubRegistrations ?? []
     };
   } catch (err) {
     console.error("Supabase readDb connection failed, falling back to demo DB:", err);
@@ -141,7 +149,8 @@ export async function writeDb(db: Database, tables?: DbTableKey[]): Promise<void
           "files",
           "points",
           "checkpoints",
-          "checkpointSubmissions"
+          "checkpointSubmissions",
+          "clubRegistrations"
         ];
 
   for (const table of targetTables) {

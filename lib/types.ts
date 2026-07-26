@@ -120,6 +120,20 @@ export type CheckpointSubmission = {
   awardedPointId?: string;
 };
 
+export type ClubRegistration = {
+  id: string;
+  name: string;
+  studentId: string;
+  email: string;
+  phone: string;
+  class: string;
+  division: string;
+  primaryLanguage: string;
+  otherLanguages: string;
+  codingLevel: number;
+  createdAt: string;
+};
+
 export type Database = {
   users: User[];
   teams: Team[];
@@ -132,4 +146,5 @@ export type Database = {
   points: LeaderboardPoint[];
   checkpoints: TeamCheckpoint[];
   checkpointSubmissions: CheckpointSubmission[];
+  clubRegistrations?: ClubRegistration[];
 };

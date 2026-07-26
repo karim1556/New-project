@@ -652,3 +652,44 @@ export async function reviewCheckpointAction(formData: FormData): Promise<void> 
   revalidatePath("/admin/leaderboard");
   toastSuccess("Checkpoint review saved.", "/admin/checkpoints");
 }
+
+export async function registerClubMemberAction(formData: FormData): Promise<void> {
+  const name = String(formData.get("name") ?? "").trim();
+  const studentId = String(formData.get("studentId") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const phone = String(formData.get("phone") ?? "").trim();
+  const studentClass = String(formData.get("class") ?? "").trim();
+  const division = String(formData.get("division") ?? "").trim();
+  const primaryLanguage = String(formData.get("primaryLanguage") ?? "").trim();
+  const otherLanguages = String(formData.get("otherLanguages") ?? "").trim();
+  const codingLevel = asNumber(formData.get("codingLevel"), 1);
+
+  if (!name || !studentId || !email || !phone || !studentClass || !division || !primaryLanguage) {
+    toastError("Please fill out all required fields.", "/");
+  }
+
+  const db = await readDb();
+  if (!db.clubRegistrations) {
+    db.clubRegistrations = [];
+  }
+
+  const regId = makeId("reg");
+  db.clubRegistrations.unshift({
+    id: regId,
+    name,
+    studentId,
+    email,
+    phone,
+    class: studentClass,
+    division,
+    primaryLanguage,
+    otherLanguages,
+    codingLevel: Math.max(1, Math.min(5, codingLevel)),
+    createdAt: new Date().toISOString()
+  });
+
+  await writeDb(db, ["clubRegistrations"]);
+  revalidatePath("/");
+  revalidatePath("/admin/registrations");
+  redirect("/?registered=true");
+}

@@ -152,6 +152,7 @@ export function getDemoDb(): Database {
       }
     ],
     checkpoints: [],
-    checkpointSubmissions: []
+    checkpointSubmissions: [],
+    clubRegistrations: []
   };
 }

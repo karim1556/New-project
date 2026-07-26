@@ -1,94 +1,332 @@
-import { getSession } from "@/lib/auth";
 import Link from "next/link";
+import { registerClubMemberAction } from "@/lib/actions";
+import { SubmitButton } from "@/components/submit-button";
 
-const stats = [
-  { value: "25+", label: "Teams" },
-  { value: "2.4k", label: "Updates" },
-  { value: "< 60s", label: "Reports" },
-  { value: "99.2%", label: "Accuracy" },
-];
-
-export default function HomePage() {
-  const session = getSession();
-  const dashboardHref = session
-    ? session.role === "admin"
-      ? "/admin"
-      : "/member"
-    : "/login";
+export default function HomePage({
+  searchParams
+}: {
+  searchParams?: { registered?: string; error?: string };
+}) {
+  const isRegistered = searchParams?.registered === "true";
+  const errorMessage = searchParams?.error;
 
   return (
-    <div className="lp-root">
-      {/* Nav */}
-      <nav className="lp-nav">
-        <span className="lp-logo">CLUBOS</span>
-        <div className="lp-nav-right">
-          <Link href="/login" className="lp-ghost">Login</Link>
-          <Link href={dashboardHref} className="lp-pill">
-            {session ? "Dashboard" : "Get started"}
+    <div className="reg-page-container">
+      {/* Background Animated Light Orbs */}
+      <div className="bg-glow bg-glow-1" />
+      <div className="bg-glow bg-glow-2" />
+      <div className="bg-glow bg-glow-3" />
+      <div className="bg-grid-overlay" />
+
+      {/* Top Header Bar */}
+      <header className="reg-header">
+        <div className="reg-logo-group">
+          <span className="reg-logo-icon">⚡</span>
+          <span className="reg-logo-text">HACKATHON CLUB</span>
+          <span className="reg-year-badge">2026 BATCH</span>
+        </div>
+        <div className="reg-header-right">
+          <span className="status-indicator">
+            <span className="status-dot" />
+            REGISTRATIONS OPEN
+          </span>
+          <Link href="/login" className="admin-login-ghost">
+            Admin Access 🔒
           </Link>
         </div>
-      </nav>
+      </header>
 
-      {/* Hero */}
-      <section className="lp-hero">
-        <div className="lp-noise" />
-        <div className="lp-glow lp-glow-1" />
-        <div className="lp-glow lp-glow-2" />
-
-        <p className="lp-eyebrow">Hackathon OS</p>
-        <h1 className="lp-headline">
-          Run your club.<br />
-          <em>Like a product team.</em>
-        </h1>
-        <p className="lp-sub">
-          One command center for teams, checkpoints,
-          leaderboards &amp; reports.
-        </p>
-
-        <div className="lp-ctas">
-          <Link href={dashboardHref} className="lp-pill lp-pill-lg">
-            {session ? "Open Dashboard" : "Launch platform"}
-          </Link>
-          <Link href="/login" className="lp-ghost lp-ghost-lg">Sign in</Link>
-        </div>
-
-        {/* Stats strip */}
-        <div className="lp-stats">
-          {stats.map((s) => (
-            <div key={s.label} className="lp-stat">
-              <span className="lp-stat-val">{s.value}</span>
-              <span className="lp-stat-lbl">{s.label}</span>
+      {/* Main Registration Content */}
+      <main className="reg-main-wrapper">
+        {isRegistered ? (
+          /* THANK YOU CONFIRMATION SCREEN */
+          <div className="thankyou-card glass-panel fade-in-up">
+            <div className="thankyou-badge-wrap">
+              <span className="thankyou-icon">🎉</span>
             </div>
-          ))}
-        </div>
-      </section>
+            <h1 className="thankyou-title">Registration Submitted!</h1>
+            <p className="thankyou-subtitle">
+              Welcome to <strong>Hackathon Club 2026</strong>. Your application has been successfully recorded in our database.
+            </p>
 
-      {/* Feature trio */}
-      <section className="lp-trio">
-        <article className="lp-card">
-          <span className="lp-card-icon">⌘</span>
-          <h3>Command Center</h3>
-          <p>Every team, every log, every blocker — one screen.</p>
-        </article>
-        <article className="lp-card">
-          <span className="lp-card-icon">◈</span>
-          <h3>Checkpoint Engine</h3>
-          <p>Milestones reviewed &amp; approved before points land.</p>
-        </article>
-        <article className="lp-card">
-          <span className="lp-card-icon">↗</span>
-          <h3>Instant Reports</h3>
-          <p>PDF-ready weekly reports generated in under a minute.</p>
-        </article>
-      </section>
+            <div className="thankyou-details-box">
+              <div className="detail-item">
+                <span className="detail-label">Status</span>
+                <span className="detail-status-pill">APPLICATION RECEIVED</span>
+              </div>
+              <div className="detail-item">
+                <span className="detail-label">Next Step</span>
+                <span className="detail-val">Check your WhatsApp &amp; Email for upcoming orientation details.</span>
+              </div>
+            </div>
 
-      {/* Bottom CTA */}
-      <section className="lp-bottom">
-        <h2>Ready to compete?</h2>
-        <Link href={dashboardHref} className="lp-pill lp-pill-lg">
-          {session ? "Open Dashboard" : "Get started free"}
-        </Link>
-      </section>
+            {/* TWO CONTACT NUMBERS SECTION */}
+            <div className="contacts-section">
+              <h3 className="contacts-title">Have questions or need assistance? Contact our team:</h3>
+              <div className="contacts-grid">
+                <div className="contact-card">
+                  <div className="contact-role">Club President / Lead</div>
+                  <div className="contact-name">President Office</div>
+                  <div className="contact-phone">+91 98765 43210</div>
+                  <a
+                    href="https://wa.me/919876543210?text=Hi!%20I%20have%20a%20query%20regarding%20Hackathon%20Club%202026%20registration."
+                    target="_blank"
+                    rel="noreferrer"
+                    className="wa-button"
+                  >
+                    💬 Chat on WhatsApp
+                  </a>
+                </div>
+
+                <div className="contact-card">
+                  <div className="contact-role">Technical Lead / Support</div>
+                  <div className="contact-name">Tech Support Team</div>
+                  <div className="contact-phone">+91 91234 56789</div>
+                  <a
+                    href="https://wa.me/919123456789?text=Hi!%20I%20have%20a%20technical%20query%20regarding%20Hackathon%20Club%202026."
+                    target="_blank"
+                    rel="noreferrer"
+                    className="wa-button wa-button-alt"
+                  >
+                    💬 Chat on WhatsApp
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="thankyou-actions">
+              <Link href="/" className="btn-secondary-glow">
+                Submit Another Response
+              </Link>
+            </div>
+          </div>
+        ) : (
+          /* REGISTRATION FORM SCREEN */
+          <div className="reg-card-container fade-in-up">
+            <div className="reg-hero-banner">
+              <div className="hero-eyebrow">OFFICIAL RECRUITMENT FORM</div>
+              <h1 className="hero-title">
+                HACKATHON CLUB <span className="hero-gradient-text">2026</span>
+              </h1>
+              <p className="hero-sub">
+                Build real-world projects, compete in nationwide hackathons, and collaborate with top developers on campus.
+              </p>
+            </div>
+
+            {errorMessage && (
+              <div className="error-banner">
+                ⚠️ {errorMessage === "fill_all" ? "Please fill in all required fields." : errorMessage}
+              </div>
+            )}
+
+            <form action={registerClubMemberAction} className="reg-form-body">
+              {/* SECTION 1: PERSONAL INFORMATION */}
+              <div className="form-section-card glass-card">
+                <div className="section-header">
+                  <span className="section-num">01</span>
+                  <div>
+                    <h2 className="section-title">Personal Details</h2>
+                    <p className="section-desc">Provide your contact and identification details.</p>
+                  </div>
+                </div>
+
+                <div className="field-group">
+                  <label htmlFor="name" className="field-label">
+                    Name of the student <span className="req-star">*</span>
+                  </label>
+                  <input
+                    id="name"
+                    name="name"
+                    type="text"
+                    required
+                    placeholder="e.g. Karim Shaikh"
+                    className="reg-input"
+                  />
+                </div>
+
+                <div className="field-grid-2">
+                  <div className="field-group">
+                    <label htmlFor="studentId" className="field-label">
+                      Student ID / Roll No <span className="req-star">*</span>
+                    </label>
+                    <input
+                      id="studentId"
+                      name="studentId"
+                      type="text"
+                      required
+                      placeholder="e.g. 2026-CS-042"
+                      className="reg-input"
+                    />
+                  </div>
+
+                  <div className="field-group">
+                    <label htmlFor="phone" className="field-label">
+                      Contact number (WhatsApp preferred) <span className="req-star">*</span>
+                    </label>
+                    <input
+                      id="phone"
+                      name="phone"
+                      type="tel"
+                      required
+                      placeholder="e.g. +91 9876543210"
+                      className="reg-input"
+                    />
+                  </div>
+                </div>
+
+                <div className="field-group">
+                  <label htmlFor="email" className="field-label">
+                    Email address <span className="req-star">*</span>
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    required
+                    placeholder="e.g. student@college.edu"
+                    className="reg-input"
+                  />
+                </div>
+              </div>
+
+              {/* SECTION 2: ACADEMIC DETAILS */}
+              <div className="form-section-card glass-card">
+                <div className="section-header">
+                  <span className="section-num">02</span>
+                  <div>
+                    <h2 className="section-title">Academic Information</h2>
+                    <p className="section-desc">Select your current class and division.</p>
+                  </div>
+                </div>
+
+                <div className="field-grid-2">
+                  <div className="field-group">
+                    <label htmlFor="class" className="field-label">
+                      Class <span className="req-star">*</span>
+                    </label>
+                    <select id="class" name="class" required defaultValue="" className="reg-select">
+                      <option value="" disabled>
+                        Select your class
+                      </option>
+                      <option value="FE">FE (First Year)</option>
+                      <option value="SE">SE (Second Year)</option>
+                      <option value="TE">TE (Third Year)</option>
+                      <option value="BE">BE (Final Year)</option>
+                      <option value="Other">Other / Postgraduate</option>
+                    </select>
+                  </div>
+
+                  <div className="field-group">
+                    <label htmlFor="division" className="field-label">
+                      Division <span className="req-star">*</span>
+                    </label>
+                    <input
+                      id="division"
+                      name="division"
+                      type="text"
+                      required
+                      placeholder="e.g. Div A / B / C"
+                      className="reg-input"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* SECTION 3: TECHNICAL EXPERIENCE & RATING (MATCHING SCREENSHOT) */}
+              <div className="form-section-card glass-card">
+                <div className="section-header">
+                  <span className="section-num">03</span>
+                  <div>
+                    <h2 className="section-title">Experience &amp; Technical Skills</h2>
+                    <p className="section-desc">Tell us about your coding skills and background.</p>
+                  </div>
+                </div>
+
+                <div className="field-group">
+                  <label htmlFor="primaryLanguage" className="field-label">
+                    Primary programming language <span className="req-star">*</span>
+                  </label>
+                  <input
+                    id="primaryLanguage"
+                    name="primaryLanguage"
+                    type="text"
+                    required
+                    placeholder="e.g. Python, C++, Java, JavaScript, Rust"
+                    className="reg-input"
+                  />
+                </div>
+
+                <div className="field-group">
+                  <label htmlFor="otherLanguages" className="field-label">
+                    Other languages / technologies known
+                  </label>
+                  <textarea
+                    id="otherLanguages"
+                    name="otherLanguages"
+                    rows={3}
+                    placeholder="e.g. React, Next.js, Flutter, Node.js, Docker, AI/ML libraries..."
+                    className="reg-textarea"
+                  />
+                </div>
+
+                {/* SELF-RATING CODING LEVEL 1-5 (FROM SCREENSHOT) */}
+                <div className="field-group">
+                  <label className="field-label">
+                    Self-rating of coding level <span className="req-star">*</span>
+                  </label>
+                  <p className="rating-help-text">Rate your technical proficiency from 1 (Beginner) to 5 (Advanced)</p>
+                  
+                  <div className="rating-scale-container">
+                    <div className="rating-endpoint">Beginner</div>
+                    <div className="rating-options">
+                      {[1, 2, 3, 4, 5].map((lvl) => (
+                        <label key={lvl} className="rating-chip">
+                          <input
+                            type="radio"
+                            name="codingLevel"
+                            value={lvl}
+                            defaultChecked={lvl === 3}
+                            className="rating-radio"
+                          />
+                          <span className="rating-box">
+                            <span className="rating-num">{lvl}</span>
+                            <span className="rating-lbl">
+                              {lvl === 1
+                                ? "Novice"
+                                : lvl === 2
+                                ? "Basic"
+                                : lvl === 3
+                                ? "Intermediate"
+                                : lvl === 4
+                                ? "Proficient"
+                                : "Advanced"}
+                            </span>
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                    <div className="rating-endpoint">Advanced</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* FORM SUBMISSION BUTTON */}
+              <div className="form-submit-row">
+                <SubmitButton
+                  className="btn-submit-cyber"
+                  label="Submit Registration 🚀"
+                  pendingLabel="Submitting Registration..."
+                />
+              </div>
+            </form>
+          </div>
+        )}
+      </main>
+
+      {/* Footer */}
+      <footer className="reg-footer">
+        <p>© 2026 Hackathon Club • College of Engineering &amp; Technology</p>
+      </footer>
     </div>
   );
 }

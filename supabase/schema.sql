@@ -115,6 +115,20 @@ create table if not exists public.checkpoint_submissions (
   "awardedPointId" text null
 );
 
+create table if not exists public.club_registrations (
+  id text primary key,
+  name text not null,
+  "studentId" text not null,
+  email text not null,
+  phone text not null,
+  class text not null,
+  division text not null,
+  "primaryLanguage" text not null,
+  "otherLanguages" text not null,
+  "codingLevel" int not null default 1,
+  "createdAt" text not null
+);
+
 -- Seed data (optional)
 insert into public.users (id, name, email, password, role, "teamId", "isTeamLeader") values
 ('u_admin','Club Admin','admin@club.local','admin123','admin',null,false),

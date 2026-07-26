@@ -18,33 +18,26 @@ export function middleware(request: NextRequest) {
   const raw = request.cookies.get(COOKIE_NAME)?.value;
   const session = parseSession(raw);
 
-  // Already authenticated — redirect away from /login to correct dashboard
-  if (session && pathname === "/login") {
-    const dest = session.role === "admin" ? "/admin" : "/member";
-    return NextResponse.redirect(new URL(dest, request.url));
-  }
-
-  const isProtected = PROTECTED_PREFIXES.some(
-    (prefix) => pathname === prefix || pathname.startsWith(prefix + "/")
-  );
-
-  // Unauthenticated user hitting a protected route — send to login
-  if (isProtected && !session) {
-    const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  if (isProtected && session) {
-    // Role mismatch — redirect to the correct dashboard
-    if (pathname.startsWith("/admin") && session.role !== "admin") {
-      return NextResponse.redirect(new URL("/member", request.url));
-    }
-    if (pathname.startsWith("/member") && session.role !== "member") {
+  // Allow login page access for admins
+  if (pathname === "/login") {
+    if (session && session.role === "admin") {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
+    return NextResponse.next();
+  }
 
-    // Attach identity headers for server components / route handlers
+  // Member routes are completely locked down for website registration focus
+  if (pathname.startsWith("/member")) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  // Admin routes require active admin session
+  if (pathname.startsWith("/admin")) {
+    if (!session || session.role !== "admin") {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("next", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
     const res = NextResponse.next();
     res.headers.set("x-club-role", session.role);
     res.headers.set("x-club-user", session.userId);
