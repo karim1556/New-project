@@ -96,7 +96,10 @@ export async function readDb(): Promise<Database> {
       checkpointSubmissions: checkpointSubmissions ?? [],
       clubRegistrations: clubRegistrations ?? []
     };
-  } catch (err) {
+  } catch (err: any) {
+    if (err?.digest === "DYNAMIC_SERVER_USAGE" || String(err?.message || "").includes("DYNAMIC_SERVER_USAGE")) {
+      throw err;
+    }
     console.error("Supabase readDb connection failed, falling back to demo DB:", err);
     isDemoFallback = true;
     return getDemoDb();
