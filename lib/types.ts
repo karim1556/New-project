@@ -131,6 +131,10 @@ export type ClubRegistration = {
   primaryLanguage: string;
   otherLanguages: string;
   codingLevel: number;
+  hackathonExperience?: string;
+  previousProjects?: string;
+  githubPortfolio?: string;
+  projectIdea?: string;
   createdAt: string;
 };
 

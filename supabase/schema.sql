@@ -126,6 +126,10 @@ create table if not exists public.club_registrations (
   "primaryLanguage" text not null,
   "otherLanguages" text not null,
   "codingLevel" int not null default 1,
+  "hackathonExperience" text,
+  "previousProjects" text,
+  "githubPortfolio" text,
+  "projectIdea" text,
   "createdAt" text not null
 );
 

@@ -27,8 +27,11 @@ export default async function AdminRegistrationsPage() {
                   <th>WhatsApp / Phone</th>
                   <th>Email</th>
                   <th>Primary Lang</th>
-                  <th>Other Tech</th>
                   <th>Coding Level</th>
+                  <th>Hackathon Exp</th>
+                  <th>GitHub / Portfolio</th>
+                  <th>Previous Projects</th>
+                  <th>Project Idea</th>
                   <th>Registered At</th>
                 </tr>
               </thead>
@@ -61,12 +64,27 @@ export default async function AdminRegistrationsPage() {
                     <td>
                       <span className="pill-tag">{reg.primaryLanguage}</span>
                     </td>
-                    <td>{reg.otherLanguages || "-"}</td>
                     <td>
                       <span className="rating-badge">
                         ⚡ Level {reg.codingLevel} / 5
                       </span>
                     </td>
+                    <td>
+                      <span className={reg.hackathonExperience === "Yes" ? "badge badge-success" : "badge"}>
+                        {reg.hackathonExperience || "No"}
+                      </span>
+                    </td>
+                    <td>
+                      {reg.githubPortfolio ? (
+                        <a href={reg.githubPortfolio} target="_blank" rel="noreferrer" className="link">
+                          🔗 Link
+                        </a>
+                      ) : (
+                        "-"
+                      )}
+                    </td>
+                    <td style={{ maxWidth: "200px", whiteSpace: "normal" }}>{reg.previousProjects || "-"}</td>
+                    <td style={{ maxWidth: "220px", whiteSpace: "normal" }}>{reg.projectIdea || "-"}</td>
                     <td>
                       {new Date(reg.createdAt).toLocaleDateString("en-IN", {
                         day: "numeric",

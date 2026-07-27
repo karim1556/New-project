@@ -663,6 +663,10 @@ export async function registerClubMemberAction(formData: FormData): Promise<void
   const primaryLanguage = String(formData.get("primaryLanguage") ?? "").trim();
   const otherLanguages = String(formData.get("otherLanguages") ?? "").trim();
   const codingLevel = asNumber(formData.get("codingLevel"), 1);
+  const hackathonExperience = String(formData.get("hackathonExperience") ?? "No").trim();
+  const previousProjects = String(formData.get("previousProjects") ?? "").trim();
+  const githubPortfolio = String(formData.get("githubPortfolio") ?? "").trim();
+  const projectIdea = String(formData.get("projectIdea") ?? "").trim();
 
   if (!name || !studentId || !email || !phone || !studentClass || !division || !primaryLanguage) {
     toastError("Please fill out all required fields.", "/");
@@ -685,6 +689,10 @@ export async function registerClubMemberAction(formData: FormData): Promise<void
     primaryLanguage,
     otherLanguages,
     codingLevel: Math.max(1, Math.min(5, codingLevel)),
+    hackathonExperience,
+    previousProjects,
+    githubPortfolio,
+    projectIdea,
     createdAt: new Date().toISOString()
   });
 

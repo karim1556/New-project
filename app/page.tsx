@@ -304,6 +304,86 @@ export default function HomePage({
                 </div>
               </div>
 
+              {/* SECTION 4: HACKATHONS, PROJECTS & PORTFOLIO (FROM SCREENSHOT) */}
+              <div className="form-section-card glass-card">
+                <div className="section-header">
+                  <span className="section-num">04</span>
+                  <div>
+                    <h2 className="section-title">Projects, Hackathons &amp; Portfolio</h2>
+                    <p className="section-desc">Share your hackathon background, past projects, and GitHub links.</p>
+                  </div>
+                </div>
+
+                <div className="field-group">
+                  <label className="field-label">
+                    Have you participated in any hackathon before? <span className="req-star">*</span>
+                  </label>
+                  <div className="radio-options-row">
+                    <label className="radio-chip-option">
+                      <input
+                        type="radio"
+                        name="hackathonExperience"
+                        value="Yes"
+                        required
+                        className="radio-input-custom"
+                      />
+                      <span className="radio-box-custom">Yes</span>
+                    </label>
+                    <label className="radio-chip-option">
+                      <input
+                        type="radio"
+                        name="hackathonExperience"
+                        value="No"
+                        required
+                        defaultChecked
+                        className="radio-input-custom"
+                      />
+                      <span className="radio-box-custom">No</span>
+                    </label>
+                  </div>
+                </div>
+
+                <div className="field-group">
+                  <label htmlFor="previousProjects" className="field-label">
+                    What projects did you build previously? Mention project details.
+                  </label>
+                  <textarea
+                    id="previousProjects"
+                    name="previousProjects"
+                    rows={3}
+                    placeholder="e.g. Web app for student attendance, AI chatbot, mobile game..."
+                    className="reg-textarea"
+                  />
+                </div>
+
+                <div className="field-group">
+                  <label htmlFor="githubPortfolio" className="field-label">
+                    GitHub / portfolio link (if any)
+                  </label>
+                  <input
+                    id="githubPortfolio"
+                    name="githubPortfolio"
+                    type="url"
+                    placeholder="e.g. https://github.com/username or portfolio link"
+                    className="reg-input"
+                  />
+                </div>
+
+                <div className="field-group">
+                  <label htmlFor="projectIdea" className="field-label">
+                    Do you already have a project idea? Briefly describe your idea (if any) <span className="req-star">*</span>
+                  </label>
+                  <textarea
+                    id="projectIdea"
+                    name="projectIdea"
+                    rows={3}
+                    required
+                    placeholder="Briefly describe your project idea or what you want to build during the hackathon..."
+                    className="reg-textarea"
+                  />
+                </div>
+              </div>
+
               {/* FORM SUBMISSION BUTTON */}
               <div className="form-submit-row">
                 <SubmitButton
