@@ -37,6 +37,12 @@ export default function LoginPage({
             <p className="login-error">Invalid email or password.</p>
           ) : null}
 
+          {searchParams.error === "account_pending" ? (
+            <p className="login-error" style={{ background: "#e0f2fe", color: "#0369a1", borderColor: "#7dd3fc" }}>
+              ℹ️ Your 2026 Registration is received! Member logins are enabled once assigned to a team by the admin.
+            </p>
+          ) : null}
+
           {searchParams.error === "leader_only" ? (
             <p className="login-error">
               Only team leader accounts can access the member dashboard.

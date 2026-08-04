@@ -26,9 +26,17 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Member routes are completely locked down for website registration focus
+  // Member routes check
   if (pathname.startsWith("/member")) {
-    return NextResponse.redirect(new URL("/", request.url));
+    if (!session || (session.role !== "member" && session.role !== "admin")) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("next", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+    const res = NextResponse.next();
+    res.headers.set("x-club-role", session.role);
+    res.headers.set("x-club-user", session.userId);
+    return res;
   }
 
   // Admin routes require active admin session

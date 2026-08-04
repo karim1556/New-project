@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
+import { FloatingAIWidget } from "@/components/floating-ai-widget";
 
 export type NavItem = {
   href: string;
@@ -68,6 +69,7 @@ export function AppShell({
         </header>
         <main>{children}</main>
       </div>
+      {pathname.startsWith("/admin") && <FloatingAIWidget />}
     </div>
   );
 }

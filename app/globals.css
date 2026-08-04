@@ -1,19 +1,19 @@
 :root {
-  --bg: #080c12;
-  --surface: #0d1218;
-  --surface-soft: #111820;
-  --ink: #e8eaf0;
-  --muted: #6b7a94;
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(255, 255, 255, 0.14);
-  --accent: #5eead4;
-  --accent-soft: rgba(94, 234, 212, 0.12);
-  --danger-soft: rgba(239, 68, 68, 0.12);
-  --danger-ink: #f87171;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-soft: #f1f5f9;
+  --ink: #0f172a;
+  --muted: #64748b;
+  --line: #e2e8f0;
+  --line-strong: #cbd5e1;
+  --accent: #4f46e5;
+  --accent-soft: rgba(79, 70, 229, 0.08);
+  --danger-soft: rgba(239, 68, 68, 0.08);
+  --danger-ink: #dc2626;
   --radius: 16px;
   --radius-sm: 12px;
-  --shadow-sm: 0 8px 24px rgba(0, 0, 0, 0.35);
-  --shadow-md: 0 22px 56px rgba(0, 0, 0, 0.5);
+  --shadow-sm: 0 4px 16px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 12px 32px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
 }
 
 * {
@@ -23,7 +23,7 @@
 html,
 body {
   min-height: 100%;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 body {
@@ -127,19 +127,21 @@ main {
 
 .brand-pill {
   display: inline-block;
-  border: 1px solid rgba(94, 234, 212, 0.3);
-  background: rgba(94, 234, 212, 0.08);
-  color: #5eead4;
+  border: 1px solid #c7d2fe;
+  background: #eef2ff;
+  color: #4f46e5;
   border-radius: 999px;
   font-size: 0.72rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  padding: 0.2rem 0.54rem;
+  padding: 0.2rem 0.6rem;
 }
 
 .sidebar h2 {
   font-size: 1.05rem;
   margin-top: 0.6rem;
+  color: var(--ink);
 }
 
 .sidebar nav {
@@ -151,19 +153,20 @@ main {
 .sidebar a {
   display: block;
   font-size: 0.93rem;
-  color: var(--muted);
+  color: #64748b;
   padding: 0.56rem 0.72rem;
   border: 1px solid transparent;
   border-radius: 11px;
   transition: all 160ms ease;
+  font-weight: 500;
 }
 
 .sidebar a:hover,
 .sidebar a.active {
-  border-color: var(--line);
-  color: var(--ink);
-  background: var(--surface-soft);
-  color: #5eead4;
+  border-color: #c7d2fe;
+  color: #4f46e5;
+  background: #eef2ff;
+  font-weight: 600;
 }
 
 .logout-form {
@@ -333,15 +336,15 @@ button {
   padding: 0.62rem 1rem;
   cursor: pointer;
   font-weight: 600;
-  color: #030a10;
-  background: linear-gradient(130deg, #5eead4, #38bdf8);
+  color: #ffffff;
+  background: linear-gradient(130deg, #4f46e5, #0284c7);
   transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
-  box-shadow: 0 8px 24px rgba(56, 189, 248, 0.2);
+  box-shadow: 0 4px 14px rgba(79, 70, 229, 0.25);
 }
 
 button:hover {
   transform: translateY(-1px);
-  opacity: 0.9;
+  opacity: 0.94;
 }
 
 button:disabled {
@@ -351,10 +354,14 @@ button:disabled {
 }
 
 button.secondary {
-  background: var(--surface-soft);
-  color: var(--ink);
-  border: 1px solid var(--line-strong);
+  background: #f1f5f9;
+  color: #1e293b;
+  border: 1px solid #cbd5e1;
   box-shadow: none;
+}
+
+button.secondary:hover {
+  background: #e2e8f0;
 }
 
 .badge {
@@ -363,23 +370,27 @@ button.secondary {
   border-radius: 999px;
   font-size: 0.74rem;
   font-weight: 600;
-  background: rgba(94, 234, 212, 0.12);
-  color: #5eead4;
+  background: #eef2ff;
+  color: #4f46e5;
+  border: 1px solid #c7d2fe;
 }
 
 .badge.badge-off {
-  background: rgba(239, 68, 68, 0.12);
-  color: #f87171;
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
 }
 
 .badge.badge-critical {
-  background: rgba(239, 68, 68, 0.12);
-  color: #f87171;
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fecaca;
 }
 
 .badge.badge-muted {
-  background: rgba(107, 122, 148, 0.18);
-  color: #a4b2ca;
+  background: #f1f5f9;
+  color: #64748b;
+  border-color: #e2e8f0;
 }
 
 .notice-stack {
@@ -476,10 +487,10 @@ button.secondary {
 }
 
 .login-hero {
-  border: 1px solid var(--line);
+  border: 1px solid #cbd5e1;
   border-radius: 24px;
-  background: linear-gradient(165deg, #0f172a, #172554 55%, #0f766e 130%);
-  color: #eef2ff;
+  background: linear-gradient(165deg, #eef2ff 0%, #e0e7ff 60%, #e0f2fe 100%);
+  color: #0f172a;
   padding: 2rem;
   box-shadow: var(--shadow-md);
   position: relative;
@@ -492,16 +503,17 @@ button.secondary {
   inset: -20% -20% auto auto;
   width: 260px;
   height: 260px;
-  background: radial-gradient(circle, rgba(94, 234, 212, 0.34), transparent 70%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.2), transparent 70%);
 }
 
 .login-hero h1 {
   font-size: clamp(2rem, 3vw, 2.8rem);
   line-height: 1.05;
+  color: #0f172a;
 }
 
 .login-hero p {
-  color: rgba(238, 242, 255, 0.86);
+  color: #475569;
   margin-top: 1rem;
   max-width: 36ch;
 }
@@ -517,13 +529,14 @@ button.secondary {
   align-items: center;
   gap: 0.55rem;
   font-size: 0.95rem;
+  color: #1e293b;
 }
 
 .login-dot {
   width: 8px;
   height: 8px;
   border-radius: 99px;
-  background: #5eead4;
+  background: #4f46e5;
 }
 
 .login-card {
@@ -592,8 +605,8 @@ button.secondary {
 
 .lp-root {
   min-height: 100dvh;
-  background: #080c12;
-  color: #e8eaf0;
+  background: #f8fafc;
+  color: #0f172a;
   display: flex;
   flex-direction: column;
   font-family: "Satoshi", "Avenir Next", "Segoe UI", sans-serif;
@@ -608,16 +621,16 @@ button.secondary {
   align-items: center;
   justify-content: space-between;
   padding: 1.1rem clamp(1.5rem, 5vw, 4rem);
-  background: rgba(8, 12, 18, 0.72);
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(18px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  border-bottom: 1px solid #e2e8f0;
 }
 
 .lp-logo {
   font-weight: 800;
   font-size: 0.88rem;
   letter-spacing: 0.18em;
-  color: #fff;
+  color: #0f172a;
 }
 
 .lp-nav-right {
@@ -635,8 +648,8 @@ button.secondary {
   border-radius: 999px;
   font-weight: 600;
   font-size: 0.88rem;
-  background: #fff;
-  color: #080c12;
+  background: #0f172a;
+  color: #ffffff;
   transition: opacity 0.18s, transform 0.18s;
 }
 
@@ -648,9 +661,9 @@ button.secondary {
 .lp-pill-lg {
   padding: 0.78rem 1.7rem;
   font-size: 1rem;
-  background: linear-gradient(130deg, #5eead4, #38bdf8);
-  color: #030a10;
-  box-shadow: 0 0 32px rgba(56, 189, 248, 0.28);
+  background: linear-gradient(130deg, #4f46e5, #0284c7);
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.25);
 }
 
 .lp-ghost {
@@ -658,16 +671,18 @@ button.secondary {
   align-items: center;
   padding: 0.55rem 1rem;
   border-radius: 999px;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 0.88rem;
-  color: rgba(232, 234, 240, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  transition: border-color 0.18s, color 0.18s;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  transition: all 0.18s ease;
 }
 
 .lp-ghost:hover {
-  border-color: rgba(255, 255, 255, 0.3);
-  color: #fff;
+  border-color: #6366f1;
+  color: #4f46e5;
+  background: #eef2ff;
 }
 
 .lp-ghost-lg {
@@ -707,7 +722,7 @@ button.secondary {
 .lp-glow-1 {
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.13), transparent 70%);
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.12), transparent 70%);
   top: -160px;
   left: 50%;
   transform: translateX(-50%);
@@ -716,7 +731,7 @@ button.secondary {
 .lp-glow-2 {
   width: 480px;
   height: 480px;
-  background: radial-gradient(circle, rgba(94, 234, 212, 0.1), transparent 70%);
+  background: radial-gradient(circle, rgba(2, 132, 199, 0.1), transparent 70%);
   bottom: 0;
   right: 10%;
 }
@@ -724,30 +739,30 @@ button.secondary {
 .lp-eyebrow {
   position: relative;
   display: inline-block;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #5eead4;
-  padding: 0.3rem 0.85rem;
-  border: 1px solid rgba(94, 234, 212, 0.25);
+  color: #0284c7;
+  padding: 0.35rem 0.95rem;
+  border: 1px solid #7dd3fc;
   border-radius: 999px;
-  background: rgba(94, 234, 212, 0.06);
+  background: #e0f2fe;
 }
 
 .lp-headline {
   position: relative;
-  font-size: clamp(3rem, 8vw, 6.5rem);
-  font-weight: 800;
-  line-height: 1.0;
+  font-size: clamp(2.8rem, 7.5vw, 6rem);
+  font-weight: 900;
+  line-height: 1.05;
   letter-spacing: -0.035em;
-  color: #fff;
+  color: #0f172a;
   max-width: 14ch;
 }
 
 .lp-headline em {
   font-style: normal;
-  background: linear-gradient(110deg, #5eead4, #38bdf8 50%, #a78bfa);
+  background: linear-gradient(110deg, #4f46e5 0%, #0284c7 60%, #0d9488 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -755,10 +770,11 @@ button.secondary {
 
 .lp-sub {
   position: relative;
-  font-size: clamp(1rem, 2vw, 1.2rem);
-  color: rgba(200, 210, 230, 0.65);
-  max-width: 42ch;
+  font-size: clamp(1.05rem, 2vw, 1.25rem);
+  color: #475569;
+  max-width: 44ch;
   line-height: 1.65;
+  font-weight: 500;
 }
 
 .lp-ctas {
@@ -766,7 +782,7 @@ button.secondary {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  gap: 0.85rem;
   justify-content: center;
 }
 
@@ -775,30 +791,31 @@ button.secondary {
   position: relative;
   display: flex;
   gap: clamp(2rem, 6vw, 5rem);
-  margin-top: 1.5rem;
+  margin-top: 2rem;
   padding-top: 2rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-top: 1px solid #e2e8f0;
 }
 
 .lp-stat {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.22rem;
+  gap: 0.25rem;
 }
 
 .lp-stat-val {
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  font-weight: 800;
-  color: #fff;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 900;
+  color: #0f172a;
   letter-spacing: -0.03em;
 }
 
 .lp-stat-lbl {
-  font-size: 0.74rem;
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.14em;
-  color: rgba(200, 210, 230, 0.4);
+  color: #64748b;
 }
 
 /* Feature trio */
@@ -806,13 +823,13 @@ button.secondary {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 1px;
-  border-top: 1px solid rgba(255, 255, 255, 0.07);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
-  background: rgba(255, 255, 255, 0.05);
+  border-top: 1px solid #e2e8f0;
+  border-bottom: 1px solid #e2e8f0;
+  background: #e2e8f0;
 }
 
 .lp-card {
-  background: #080c12;
+  background: #ffffff;
   padding: clamp(2rem, 4vw, 3rem) clamp(1.5rem, 3vw, 2.5rem);
   display: flex;
   flex-direction: column;
@@ -821,25 +838,24 @@ button.secondary {
 }
 
 .lp-card:hover {
-  background: #0d1520;
+  background: #f8fafc;
 }
 
 .lp-card-icon {
   font-size: 1.6rem;
   line-height: 1;
-  opacity: 0.7;
 }
 
 .lp-card h3 {
-  font-size: 1.12rem;
-  font-weight: 700;
-  color: #fff;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #0f172a;
   letter-spacing: -0.01em;
 }
 
 .lp-card p {
-  font-size: 0.92rem;
-  color: rgba(200, 210, 230, 0.5);
+  font-size: 0.93rem;
+  color: #64748b;
   line-height: 1.6;
   max-width: 28ch;
 }
@@ -849,17 +865,18 @@ button.secondary {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2rem;
+  gap: 1.8rem;
   padding: clamp(4rem, 8vw, 7rem) 1.5rem;
   text-align: center;
+  background: #ffffff;
 }
 
 .lp-bottom h2 {
-  font-size: clamp(2rem, 5vw, 3.8rem);
-  font-weight: 800;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  font-weight: 900;
   letter-spacing: -0.03em;
-  color: #fff;
-  line-height: 1.05;
+  color: #0f172a;
+  line-height: 1.08;
 }
 
 @keyframes lift-in {

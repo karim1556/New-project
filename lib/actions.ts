@@ -24,11 +24,11 @@ export async function loginAction(formData: FormData): Promise<void> {
   const user = db.users.find((u) => u.email.toLowerCase() === email && u.password === password);
 
   if (!user) {
+    const isRegistered = (db.clubRegistrations || []).some((r) => r.email.toLowerCase() === email);
+    if (isRegistered) {
+      redirect("/login?error=account_pending");
+    }
     redirect("/login?error=invalid_credentials");
-  }
-
-  if (user.role === "member" && !user.isTeamLeader) {
-    redirect("/login?error=leader_only");
   }
 
   setSession(user.id, user.role);
@@ -669,7 +669,7 @@ export async function registerClubMemberAction(formData: FormData): Promise<void
   const projectIdea = String(formData.get("projectIdea") ?? "").trim();
 
   if (!name || !studentId || !email || !phone || !studentClass || !division || !primaryLanguage) {
-    toastError("Please fill out all required fields.", "/");
+    toastError("Please fill out all required fields.", "/register");
   }
 
   const db = await readDb();
@@ -697,7 +697,7 @@ export async function registerClubMemberAction(formData: FormData): Promise<void
   });
 
   await writeDb(db, ["clubRegistrations"]);
-  revalidatePath("/");
+  revalidatePath("/register");
   revalidatePath("/admin/registrations");
-  redirect("/?registered=true");
+  redirect("/register?registered=true");
 }
