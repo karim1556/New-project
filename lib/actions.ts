@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { clearSession, getCurrentUser, setSession } from "@/lib/auth";
 import { makeId, readDb, writeDb } from "@/lib/db";
+import { hasSupabaseConfig, supabaseRequest } from "@/lib/supabase";
 import { hackathonStatuses, projectStatuses } from "@/lib/constants";
 import { HackathonStatus, ProjectStatus } from "@/lib/types";
 import { toastError, toastSuccess } from "@/lib/toast";
@@ -184,6 +185,12 @@ export async function markAttendanceAction(formData: FormData): Promise<void> {
   const db = await readDb();
   const teamIds = new Set(db.teams.map((t) => t.id));
 
+  // Physically delete old records for this date from Supabase if configured
+  if (hasSupabaseConfig()) {
+    await supabaseRequest("attendance", { method: "DELETE", query: `date=eq.${date}` }).catch(() => {});
+  }
+
+  // Remove existing in-memory attendance for this date
   db.attendance = db.attendance.filter((entry) => entry.date !== date);
 
   db.users
@@ -209,6 +216,47 @@ export async function markAttendanceAction(formData: FormData): Promise<void> {
   revalidatePath("/admin/attendance");
   revalidatePath("/admin");
   toastSuccess("Attendance saved.", "/admin/attendance");
+}
+
+export async function toggleMemberAttendanceAction(formData: FormData): Promise<void> {
+  const current = await getCurrentUser();
+  if (!current || current.role !== "admin") {
+    toastError("Unauthorized request.", "/admin/attendance");
+  }
+
+  const date = String(formData.get("date") ?? "").trim();
+  const memberId = String(formData.get("memberId") ?? "").trim();
+  const teamId = String(formData.get("teamId") ?? "").trim();
+  const targetPresent = formData.get("present") === "true";
+
+  if (!date || !memberId || !teamId) {
+    toastError("Missing required parameters.", "/admin/attendance");
+  }
+
+  const db = await readDb();
+
+  // Delete all existing records for this member and date to prevent duplicates
+  if (hasSupabaseConfig()) {
+    await supabaseRequest("attendance", {
+      method: "DELETE",
+      query: `date=eq.${date}&memberId=eq.${memberId}`
+    }).catch(() => {});
+  }
+
+  db.attendance = db.attendance.filter((a) => !(a.date === date && a.memberId === memberId));
+
+  db.attendance.push({
+    id: makeId("at"),
+    date,
+    teamId,
+    memberId,
+    present: targetPresent
+  });
+
+  await writeDb(db, ["attendance"]);
+  revalidatePath("/admin/attendance");
+  revalidatePath("/admin");
+  toastSuccess(`Updated status to ${targetPresent ? "Present" : "Absent"}.`, "/admin/attendance");
 }
 
 export async function createAnnouncementAction(formData: FormData): Promise<void> {

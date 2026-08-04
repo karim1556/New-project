@@ -82,13 +82,26 @@ export async function readDb(): Promise<Database> {
 
     isDemoFallback = false;
 
+    // Deduplicate attendance entries by (date, memberId)
+    const rawAttendance = attendance ?? [];
+    const seenAttendance = new Set<string>();
+    const cleanAttendance: Database["attendance"] = [];
+    for (let i = rawAttendance.length - 1; i >= 0; i--) {
+      const item = rawAttendance[i];
+      const key = `${item.date}_${item.memberId}`;
+      if (!seenAttendance.has(key)) {
+        seenAttendance.add(key);
+        cleanAttendance.unshift(item);
+      }
+    }
+
     return {
       users: users ?? [],
       teams: teams ?? [],
       projects: projects ?? [],
       dailyLogs: dailyLogs ?? [],
       hackathons: hackathons ?? [],
-      attendance: attendance ?? [],
+      attendance: cleanAttendance,
       announcements: announcements ?? [],
       files: files ?? [],
       points: points ?? [],
